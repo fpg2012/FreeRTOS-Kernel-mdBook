@@ -1,0 +1,1357 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Software Timer Management</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title"></h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="6-software-timer-management"><a class="header" href="#6-software-timer-management">6 Software Timer Management</a></h1>
+<h2 id="61-chapter-introduction-and-scope"><a class="header" href="#61-chapter-introduction-and-scope">6.1 Chapter Introduction and Scope</a></h2>
+<p>Software timers are used to schedule the execution of a function at a
+set time in the future, or periodically with a fixed frequency. The
+function executed by the software timer is called the software timer's
+callback function.</p>
+<p>Software timers are implemented by, and are under the control of, the
+FreeRTOS kernel. They do not require hardware support, and are not
+related to hardware timers or hardware counters.</p>
+<p>Note that, in line with the FreeRTOS philosophy of using innovative
+design to ensure maximum efficiency, software timers do not use any
+processing time unless a software timer callback function is actually
+executing.</p>
+<p>Software timer functionality is optional. To include software timer
+functionality:</p>
+<ol>
+<li>
+<p>Build the FreeRTOS source file FreeRTOS/Source/timers.c as part of
+your project.</p>
+</li>
+<li>
+<p>Define the constants detailed below in the application's FreeRTOSConfig.h header file :</p>
+</li>
+</ol>
+<ul>
+<li>
+<p><code>configUSE_TIMERS</code></p>
+<p>Set <code>configUSE_TIMERS</code> to 1 in FreeRTOSConfig.h.</p>
+</li>
+<li>
+<p><code>configTIMER_TASK_PRIORITY</code></p>
+<p>Sets the priority of the timer service task between 0 and ( <code>configMAX_PRIORITIES</code> - 1 ).</p>
+</li>
+<li>
+<p><code>configTIMER_QUEUE_LENGTH</code></p>
+<p>Sets the maximum number of unprocessed commands that the timer command queue can hold at any one time.</p>
+</li>
+<li>
+<p><code>configTIMER_TASK_STACK_DEPTH</code></p>
+<p>Sets the size of the stack (in words, not bytes) allocated to the timer service task.</p>
+</li>
+</ul>
+<h3 id="611-scope"><a class="header" href="#611-scope">6.1.1 Scope</a></h3>
+<p>This chapter covers:</p>
+<ul>
+<li>The characteristics of a software timer compared to the
+characteristics of a task.</li>
+<li>The RTOS daemon task.</li>
+<li>The timer command queue.</li>
+<li>The difference between a one shot software timer and a periodic
+software timer.</li>
+<li>How to create, start, reset and change the period of a software timer.</li>
+</ul>
+<h2 id="62-software-timer-callback-functions"><a class="header" href="#62-software-timer-callback-functions">6.2 Software Timer Callback Functions</a></h2>
+<p>Software timer callback functions are implemented as C functions. The
+only thing special about them is their prototype, which must return
+void, and take a handle to a software timer as its only parameter. The
+callback function prototype is demonstrated by Listing 6.1.</p>
+<p><a name="list" title="Listing 6.1 The software timer callback function prototype"></a></p>
+<pre><code class="language-c">void ATimerCallback( TimerHandle_t xTimer );
+</code></pre>
+<p><em><strong>Listing 6.1</strong></em> <em>The software timer callback function prototype</em></p>
+<p>Software timer callback functions execute from start to finish, and exit
+in the normal way. They should be kept short, and must not enter the
+Blocked state.</p>
+<blockquote>
+<p><em>Note: As will be seen, software timer callback functions execute in the
+context of a task that is created automatically when the FreeRTOS
+scheduler is started. Therefore, it is essential that software timer
+callback functions never call FreeRTOS API functions that will result in
+the calling task entering the Blocked state. It is ok to call functions
+such as <code>xQueueReceive()</code>, but only if the function's <code>xTicksToWait</code>
+parameter (which specifies the function's block time) is set to 0. It is
+not ok to call functions such as <code>vTaskDelay()</code>, as calling <code>vTaskDelay()</code>
+will always place the calling task into the Blocked state.</em></p>
+</blockquote>
+<h2 id="63-attributes-and-states-of-a-software-timer"><a class="header" href="#63-attributes-and-states-of-a-software-timer">6.3 Attributes and States of a Software Timer</a></h2>
+<h3 id="631-period-of-a-software-timer"><a class="header" href="#631-period-of-a-software-timer">6.3.1 Period of a Software Timer</a></h3>
+<p>A software timer's 'period' is the time between the software timer being
+started, and the software timer's callback function executing.</p>
+<h3 id="632-one-shot-and-auto-reload-timers"><a class="header" href="#632-one-shot-and-auto-reload-timers">6.3.2 One-shot and Auto-reload Timers</a></h3>
+<p>There are two types of software timer:</p>
+<ol>
+<li>
+<p>One-shot timers</p>
+<p>Once started, a one-shot timer will execute its callback function
+once only. A one-shot timer can be restarted manually, but will not
+restart itself.</p>
+</li>
+<li>
+<p>Auto-reload timers</p>
+<p>Once started, an auto-reload timer will re-start itself each time it
+expires, resulting in periodic execution of its callback function.</p>
+</li>
+</ol>
+<p>Figure 6.1 shows the difference in behavior between a one-shot timer and
+an auto-reload timer. The dashed vertical lines mark the times at which
+a tick interrupt occurs.</p>
+<p><a name="fig6.1" title="Figure 6.1 The difference in behavior between one-shot and auto-reload software timers"></a></p>
+<hr />
+<p><img src="media/image38.png" alt="" /><br />
+<em><strong>Figure 6.1</strong></em> <em>The difference in behavior between one-shot and auto-reload software timers</em></p>
+<hr />
+<p>Referring to Figure 6.1:</p>
+<ul>
+<li>
+<p>Timer 1</p>
+<p>Timer 1 is a one-shot timer that has a period of 6 ticks. It is
+started at time t1, so its callback function executes 6 ticks later,
+at time t7. As timer 1 is a one-shot timer, its callback function does
+not execute again.</p>
+</li>
+<li>
+<p>Timer 2</p>
+<p>Timer 2 is an auto-reload timer that has a period of 5 ticks. It is
+started at time t1, so its callback function executes every 5 ticks
+after time t1. In Figure 6.1 this is at times t6, t11 and t16.</p>
+</li>
+</ul>
+<h3 id="633-software-timer-states"><a class="header" href="#633-software-timer-states">6.3.3 Software Timer States</a></h3>
+<p>A software timer can be in one of the following two states:</p>
+<ul>
+<li>
+<p>Dormant</p>
+<p>A Dormant software timer exists, and can be referenced by its handle,
+but is not running, so its callback functions will not execute.</p>
+</li>
+<li>
+<p>Running</p>
+<p>A Running software timer will execute its callback function after a
+time equal to its period has elapsed since the software timer entered
+the Running state, or since the software timer was last reset.</p>
+</li>
+</ul>
+<p>Figure 6.2 and Figure 6.3 show the possible transitions between the
+Dormant and Running states for an auto-reload timer and a one-shot timer
+respectively. The key difference between the two diagrams is the state
+entered after the timer has expired; the auto-reload timer executes its
+callback function then re-enters the Running state, the one-shot timer
+executes its callback function then enters the Dormant state.</p>
+<p><a name="fig6.2" title="Figure 6.2 Auto-reload software timer states and transitions"></a>
+<a name="fig6.3" title="Figure 6.3 One-shot software timer states and transitions"></a></p>
+<hr />
+<p><img src="media/image39.png" alt="" /><br />
+<em><strong>Figure 6.2</strong></em> <em>Auto-reload software timer states and transitions</em></p>
+<p><img src="media/image40.png" alt="" /><br />
+<em><strong>Figure 6.3</strong></em> <em>One-shot software timer states and transitions</em></p>
+<hr />
+<p>The <code>xTimerDelete()</code> API function deletes a timer. A timer can be deleted
+at any time. The function prototype is demonstrated by Listing 6.2.</p>
+<p><a name="list6.2" title="Listing 6.2 The xTimerDelete() API function prototype"></a></p>
+<pre><code class="language-c">BaseType_t xTimerDelete( TimerHandle_t xTimer, TickType_t xTicksToWait );
+</code></pre>
+<p><em><strong>Listing 6.2</strong></em> <em>The xTimerDelete() API function prototype</em></p>
+<p><strong>xTimerDelete() parameters and return value</strong></p>
+<ul>
+<li>
+<p><code>xTimer</code></p>
+<p>The handle of the timer being deleted.</p>
+</li>
+<li>
+<p><code>xTicksToWait</code></p>
+<p>Specifies the time, in ticks, that the calling task should be held
+in the Blocked state to wait for the delete command to be successfully
+sent to the timer command queue, should the queue already be full when
+xTimerDelete() was called.  xTicksToWait is ignored if xTimerDelete()
+is called before the scheduler is started.</p>
+</li>
+<li>
+<p>Return value</p>
+<p>There are two possible return values:</p>
+<ul>
+<li>
+<p><code>pdPASS</code></p>
+<p><code>pdPASS</code> will be returned if the command was successfully sent to the
+timer command queue.</p>
+</li>
+<li>
+<p><code>pdFAIL</code></p>
+<p><code>pdFAIL</code> will be returned if the delete command could not be sent to
+the timer command queue even after xBlockTime ticks had passed.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="64-the-context-of-a-software-timer"><a class="header" href="#64-the-context-of-a-software-timer">6.4 The Context of a Software Timer</a></h2>
+<h3 id="641-the-rtos-daemon-timer-service-task"><a class="header" href="#641-the-rtos-daemon-timer-service-task">6.4.1 The RTOS Daemon (Timer Service) Task</a></h3>
+<p>All software timer callback functions execute in the context of the same
+RTOS daemon (or 'timer service') task<sup class="footnote-reference"><a href="#10">1</a></sup>.</p>
+<div class="footnote-definition" id="10"><sup class="footnote-definition-label">1</sup>
+<p>The task used to be called the 'timer service task', because
+originally it was only used to execute software timer callback
+functions. Now the same task is used for other purposes too, so it
+is known by the more generic name of the 'RTOS daemon task'.</p>
+</div>
+<p>The daemon task is a standard FreeRTOS task that is created
+automatically when the scheduler is started. Its priority and stack size
+are set by the <code>configTIMER_TASK_PRIORITY</code> and
+<code>configTIMER_TASK_STACK_DEPTH</code> compile time configuration constants
+respectively. Both constants are defined within FreeRTOSConfig.h.</p>
+<p>Software timer callback functions must not call FreeRTOS API functions
+that will result in the calling task entering the Blocked state, as to
+do so will result in the daemon task entering the Blocked state.</p>
+<h3 id="642-the-timer-command-queue"><a class="header" href="#642-the-timer-command-queue">6.4.2 The Timer Command Queue</a></h3>
+<p>Software timer API functions send commands from the calling task to the
+daemon task on a queue called the 'timer command queue'. This is shown
+in Figure 6.4. Examples of commands include 'start a timer', 'stop a
+timer' and 'reset a timer'.</p>
+<p>The timer command queue is a standard FreeRTOS queue that is created
+automatically when the scheduler is started. The length of the timer
+command queue is set by the <code>configTIMER_QUEUE_LENGTH</code> compile time
+configuration constant in FreeRTOSConfig.h.</p>
+<p><a name="fig6.4" title="Figure 6.4 The timer command queue being used by a software timer API function to communicate with the RTOS daemon task"></a></p>
+<hr />
+<p><img src="media/image41.png" alt="" /><br />
+<em><strong>Figure 6.4</strong></em> <em>The timer command queue being used by a software timer API function to communicate with the RTOS daemon task</em></p>
+<hr />
+<h3 id="643-daemon-task-scheduling"><a class="header" href="#643-daemon-task-scheduling">6.4.3 Daemon Task Scheduling</a></h3>
+<p>The daemon task is scheduled like any other FreeRTOS task; it will only
+process commands, or execute timer callback functions, when it is the
+highest priority task that is able to run. Figure 6.5 and Figure 6.6
+demonstrate how the <code>configTIMER_TASK_PRIORITY</code> setting affects the
+execution pattern.</p>
+<p>Figure 6.5 shows the execution pattern when the priority of the daemon
+task is below the priority of a task that calls the <code>xTimerStart()</code> API
+function.</p>
+<p><a name="fig6.5" title="Figure 6.5 The execution pattern when the priority of a task calling xTimerStart() is above the priority of the daemon task"></a></p>
+<hr />
+<p><img src="media/image42.png" alt="" /><br />
+<em><strong>Figure 6.5</strong></em> <em>The execution pattern when the priority of a task calling xTimerStart() is above the priority of the daemon task</em></p>
+<hr />
+<p>Referring to Figure 6.5, in which the priority of Task 1 is higher than
+the priority of the daemon task, and the priority of the daemon task is
+higher than the priority of the Idle task:</p>
+<ol>
+<li>
+<p>At time t1</p>
+<p>Task 1 is in the Running state, and the daemon task is in the
+Blocked state.</p>
+<p>The daemon task will leave the Blocked state if a command is sent to
+the timer command queue, in which case it will process the command,
+or if a software timer expires, in which case it will execute the
+software timer's callback function.</p>
+</li>
+<li>
+<p>At time t2</p>
+<p>Task 1 calls <code>xTimerStart()</code>.</p>
+<p><code>xTimerStart()</code> sends a command to the timer command queue, causing
+the daemon task to leave the Blocked state. The priority of Task 1
+is higher than the priority of the daemon task, so the daemon task
+does not pre-empt Task 1.</p>
+<p>Task 1 is still in the Running state, and the daemon task has left
+the Blocked state and entered the Ready state.</p>
+</li>
+<li>
+<p>At time t3</p>
+<p>Task 1 completes executing the <code>xTimerStart()</code> API function. Task 1
+executed <code>xTimerStart()</code> from the start of the function to the end of
+the function, without leaving the Running state.</p>
+</li>
+<li>
+<p>At time t4</p>
+<p>Task 1 calls an API function that results in it entering the Blocked
+state. The daemon task is now the highest priority task in the Ready
+state, so the scheduler selects the daemon task as the task to enter
+the Running state. The daemon task then starts to process the
+command sent to the timer command queue by Task 1.</p>
+<blockquote>
+<p><em>Note: The time at which the software timer being started will
+expire is calculated from the time the 'start a timer' command was
+sent to the timer command queue—it is not calculated from the time
+the daemon task received the 'start a timer' command from the timer
+command queue.</em></p>
+</blockquote>
+</li>
+<li>
+<p>At time t5</p>
+<p>The daemon task has completed processing the command sent to it by
+Task 1, and attempts to receive more data from the timer command
+queue. The timer command queue is empty, so the daemon task
+re-enters the Blocked state. The daemon task will leave the Blocked
+state again if a command is sent to the timer command queue, or if a
+software timer expires.</p>
+<p>The Idle task is now the highest priority task in the Ready state,
+so the scheduler selects the Idle task as the task to enter the
+Running state.</p>
+</li>
+</ol>
+<p>Figure 6.6 shows a similar scenario to that shown by Figure 6.5, but this
+time the priority of the daemon task is above the priority of the task
+that calls <code>xTimerStart()</code>.</p>
+<p><a name="fig6.6" title="Figure 6.6 The execution pattern when the priority of a task calling xTimerStart() is below the priority of the daemon task"></a></p>
+<hr />
+<p><img src="media/image43.png" alt="" /><br />
+<em><strong>Figure 6.6</strong></em> <em>The execution pattern when the priority of a task calling xTimerStart() is below the priority of the daemon task</em></p>
+<hr />
+<p>Referring to Figure 6.6, in which the priority of the daemon task is
+higher than the priority of Task 1, and the priority of the Task 1 is
+higher than the priority of the Idle task:</p>
+<ol>
+<li>
+<p>At time t1</p>
+<p>As before, Task 1 is in the Running state, and the daemon task is in
+the Blocked state.</p>
+</li>
+<li>
+<p>At time t2</p>
+<p>Task 1 calls <code>xTimerStart()</code>.</p>
+<p><code>xTimerStart()</code> sends a command to the timer command queue, causing
+the daemon task to leave the Blocked state. The priority of the
+daemon task is higher than the priority of Task 1, so the scheduler
+selects the daemon task as the task to enter the Running state.</p>
+<p>Task 1 was pre-empted by the daemon task before it had completed
+executing the <code>xTimerStart()</code> function, and is now in the Ready state.</p>
+<p>The daemon task starts to process the command sent to the timer
+command queue by Task 1.</p>
+</li>
+<li>
+<p>At time t3</p>
+<p>The daemon task has completed processing the command sent to it by
+Task 1, and attempts to receive more data from the timer command
+queue. The timer command queue is empty, so the daemon task
+re-enters the Blocked state.</p>
+<p>Task 1 is now the highest priority task in the Ready state, so the
+scheduler selects Task 1 as the task to enter the Running state.</p>
+</li>
+<li>
+<p>At time t4</p>
+<p>Task 1 was pre-empted by the daemon task before it had completed
+executing the <code>xTimerStart()</code> function, and only exits (returns from)
+<code>xTimerStart()</code> after it has re-entered the Running state.</p>
+</li>
+<li>
+<p>At time t5</p>
+<p>Task 1 calls an API function that results in it entering the Blocked
+state. The Idle task is now the highest priority task in the Ready
+state, so the scheduler selects the Idle task as the task to enter
+the Running state.</p>
+</li>
+</ol>
+<p>In the scenario shown by Figure 6.5, time passed between Task 1 sending a
+command to the timer command queue, and the daemon task receiving and
+processing the command. In the scenario shown by Figure 6.6, the daemon
+task had received and processed the command sent to it by Task 1 before
+Task 1 returned from the function that sent the command.</p>
+<p>Commands sent to the timer command queue contain a time stamp. The time
+stamp is used to account for any time that passes between a command
+being sent by an application task, and the same command being processed
+by the daemon task. For example, if a 'start a timer' command is sent to
+start a timer that has a period of 10 ticks, the time stamp is used to
+ensure the timer being started expires 10 ticks after the command was
+sent, not 10 ticks after the command was processed by the daemon task.</p>
+<h2 id="65-creating-and-starting-a-software-timer"><a class="header" href="#65-creating-and-starting-a-software-timer">6.5 Creating and Starting a Software Timer</a></h2>
+<h3 id="651-the-xtimercreate-api-function"><a class="header" href="#651-the-xtimercreate-api-function">6.5.1 The xTimerCreate() API Function</a></h3>
+<p>FreeRTOS also includes the <code>xTimerCreateStatic()</code> function, which
+allocates the memory required to create a timer statically at compile
+time: A software timer must be explicitly created before it can be used.</p>
+<p>Software timers are referenced by variables of type <code>TimerHandle_t</code>.
+<code>xTimerCreate()</code> is used to create a software timer and returns a
+<code>TimerHandle_t</code> to reference the software timer it creates. Software
+timers are created in the Dormant state.</p>
+<p>Software timers can be created before the scheduler is running, or from
+a task after the scheduler has been started.</p>
+<p><a href="ch02.html#25-data-types-and-coding-style-guide">Section 2.5: Data Types and Coding Style Guide</a> describes the data types and naming conventions used.</p>
+<p><a name="list6.3" title="Listing 6.3 The xTimerCreate() API function prototype"></a></p>
+<pre><code class="language-c">TimerHandle_t xTimerCreate( const char * const pcTimerName,
+                            const TickType_t xTimerPeriodInTicks,
+                            const BaseType_t xAutoReload,
+                            void * const pvTimerID,
+                            TimerCallbackFunction_t pxCallbackFunction );
+</code></pre>
+<p><em><strong>Listing 6.3</strong></em> <em>The xTimerCreate() API function prototype</em></p>
+<p><strong>xTimerCreate() parameters and return value</strong></p>
+<ul>
+<li>
+<p><code>pcTimerName</code></p>
+<p>A descriptive name for the timer. This is not used by FreeRTOS in
+any way. It is included purely as a debugging aid. Identifying a timer
+by a human readable name is much simpler than attempting to identify it
+by its handle.</p>
+</li>
+<li>
+<p><code>xTimerPeriodInTicks</code></p>
+<p>The timer's period specified in ticks. The <code>pdMS_TO_TICKS()</code> macro can
+be used to convert a time specified in milliseconds into a time
+specified in ticks. Cannot be 0.</p>
+</li>
+<li>
+<p><code>xAutoReload</code></p>
+<p>Set <code>xAutoReload</code> to <code>pdTRUE</code> to create an auto-reload timer. Set
+<code>xAutoReload</code> to <code>pdFALSE</code> to create a one-shot timer.</p>
+</li>
+<li>
+<p><code>pvTimerID</code></p>
+<p>Each software timer has an ID value. The ID is a void pointer,
+and can be used by the application writer for any purpose. The ID is
+particularly useful when the same callback function is used by more than
+one software timer, as it can be used to provide timer specific storage.
+Use of a timer's ID is demonstrated in an example in this
+chapter.</p>
+<p><code>pvTimerID</code> sets an initial value for the ID of the task being created.</p>
+</li>
+<li>
+<p><code>pxCallbackFunction</code></p>
+<p>Software timer callback functions are simply C functions that
+conform to the prototype shown in Listing 6.1. The <code>pxCallbackFunction</code>
+parameter is a pointer to the function (in effect, just the function
+name) to use as the callback function for the software timer being
+created.</p>
+</li>
+<li>
+<p>Return value</p>
+<p>If NULL is returned, then the software timer cannot be created
+because there is insufficient heap memory available for FreeRTOS to
+allocate the necessary data structure.</p>
+<p>If a non-NULL value is returned it indicates that the software timer has
+been created successfully. The returned value is the handle of the
+created timer.</p>
+<p>Chapter 3 provides more information on heap memory management.</p>
+</li>
+</ul>
+<h3 id="652-the-xtimerstart-api-function"><a class="header" href="#652-the-xtimerstart-api-function">6.5.2 The xTimerStart() API Function</a></h3>
+<p><code>xTimerStart()</code> is used to start a software timer that is in the Dormant
+state, or reset (re-start) a software timer that is in the Running
+state. <code>xTimerStop()</code> is used to stop a software timer that is in the
+Running state. Stopping a software timer is the same as transitioning
+the timer into the Dormant state.</p>
+<p><code>xTimerStart()</code> can be called before the scheduler is started, but when
+this is done, the software timer will not actually start until the time
+at which the scheduler starts.</p>
+<blockquote>
+<p><em>Note: Never call <code>xTimerStart()</code> from an interrupt service routine. The
+interrupt-safe version <code>xTimerStartFromISR()</code> should be used in its
+place.</em></p>
+</blockquote>
+<p><a name="list6.4" title="Listing 6.4 The xTimerStart() API function prototype"></a></p>
+<pre><code class="language-c">BaseType_t xTimerStart( TimerHandle_t xTimer, TickType_t xTicksToWait );
+</code></pre>
+<p><em><strong>Listing 6.4</strong></em> <em>The xTimerStart() API function prototype</em></p>
+<p><strong>xTimerStart() parameters and return value</strong></p>
+<ul>
+<li>
+<p><code>xTimer</code></p>
+<p>The handle of the software timer being started or reset. The handle
+will have been returned from the call to <code>xTimerCreate()</code> used to create
+the software timer.</p>
+</li>
+<li>
+<p><code>xTicksToWait</code></p>
+<p><code>xTimerStart()</code> uses the timer command queue to send the 'start a
+timer' command to the daemon task. <code>xTicksToWait</code> specifies the maximum
+amount of time the calling task should remain in the Blocked state to
+wait for space to become available on the timer command queue, should
+the queue already be full.</p>
+<p><code>xTimerStart()</code> will return immediately if <code>xTicksToWait</code> is zero and the
+timer command queue is already full.</p>
+<p>The block time is specified in tick periods, so the absolute time it
+represents is dependent on the tick frequency. The macro <code>pdMS_TO_TICKS()</code>
+can be used to convert a time specified in milliseconds into a time
+specified in ticks.</p>
+<p>If <code>INCLUDE_vTaskSuspend</code> is set to 1 in <code>FreeRTOSConfig.h</code> then setting
+<code>xTicksToWait</code> to <code>portMAX_DELAY</code> will result in the calling task remaining
+in the Blocked state indefinitely (without a timeout) to wait for space
+to become available in the timer command queue.</p>
+<p>If <code>xTimerStart()</code> is called before the scheduler has been started then
+the value of <code>xTicksToWait</code> is ignored, and <code>xTimerStart()</code> behaves as if
+<code>xTicksToWait</code> had been set to zero.</p>
+</li>
+<li>
+<p>Return value</p>
+<p>There are two possible return values:</p>
+<ul>
+<li>
+<p><code>pdPASS</code></p>
+<p><code>pdPASS</code> will be returned only if the 'start a timer' command was
+successfully sent to the timer command queue.</p>
+<p>If the priority of the daemon task is above the priority of the task
+that called <code>xTimerStart()</code>, then the scheduler will ensure the start
+command is processed before <code>xTimerStart()</code> returns. This is because the
+daemon task will pre-empt the task that called <code>xTimerStart()</code> as soon as
+there is data in the timer command queue.</p>
+<p>If a block time was specified (<code>xTicksToWait</code> was not zero), then it is
+possible the calling task was placed into the Blocked state to wait for
+space to become available in the timer command queue before the function
+returned, but data was successfully written to the timer command queue
+before the block time expired.</p>
+</li>
+<li>
+<p><code>pdFAIL</code></p>
+<p><code>pdFAIL</code> will be returned if the 'start a timer' command could not be
+written to the timer command queue because the queue was already
+full.</p>
+<p>If a block time was specified (<code>xTicksToWait</code> was not zero) then the
+calling task will have been placed into the Blocked state to wait for
+the daemon task to make room in the timer command queue, but the
+specified block time expired before that happened.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id=""><a class="header" href="#"><a name="example6.1" title="Example 6.1 Creating one-shot and auto-reload timers"></a></a></h2>
+<p><em><strong>Example 6.1</strong></em> <em>Creating one-shot and auto-reload timers</em></p>
+<hr />
+<p>This example creates and starts a one-shot timer and an auto-reload
+timer—as shown in Listing 6.5.</p>
+<p><a name="list6.5" title="Listing 6.5 Creating and starting the timers used in Example 6.1"></a></p>
+<pre><code class="language-c">/* The periods assigned to the one-shot and auto-reload timers are 3.333 
+   second and half a second respectively. */
+#define mainONE_SHOT_TIMER_PERIOD pdMS_TO_TICKS( 3333 )
+#define mainAUTO_RELOAD_TIMER_PERIOD pdMS_TO_TICKS( 500 )
+
+int main( void )
+{
+    TimerHandle_t xAutoReloadTimer, xOneShotTimer;
+    BaseType_t xTimer1Started, xTimer2Started;
+
+    /* Create the one shot timer, storing the handle to the created timer in 
+       xOneShotTimer. */
+    xOneShotTimer = xTimerCreate(
+        /* Text name for the software timer - not used by FreeRTOS. */
+                                  "OneShot", 
+        /* The software timer's period in ticks. */
+                                   mainONE_SHOT_TIMER_PERIOD, 
+        /* Setting uxAutoRealod to pdFALSE creates a one-shot software timer. */
+                                   pdFALSE,
+        /* This example does not use the timer id. */
+                                   0,
+        /* Callback function to be used by the software timer being created. */
+                                   prvOneShotTimerCallback );
+
+    /* Create the auto-reload timer, storing the handle to the created timer 
+       in xAutoReloadTimer. */
+    xAutoReloadTimer = xTimerCreate(
+        /* Text name for the software timer - not used by FreeRTOS. */
+                                     "AutoReload",
+        /* The software timer's period in ticks. */
+                                     mainAUTO_RELOAD_TIMER_PERIOD,
+        /* Setting uxAutoRealod to pdTRUE creates an auto-reload timer. */
+                                     pdTRUE,
+        /* This example does not use the timer id. */
+                                     0,
+        /* Callback function to be used by the software timer being created. */
+                                     prvAutoReloadTimerCallback );
+
+    /* Check the software timers were created. */
+    if( ( xOneShotTimer != NULL ) &amp;&amp; ( xAutoReloadTimer != NULL ) )
+    {
+        /* Start the software timers, using a block time of 0 (no block time).
+           The scheduler has not been started yet so any block time specified 
+           here would be ignored anyway. */
+        xTimer1Started = xTimerStart( xOneShotTimer, 0 );
+        xTimer2Started = xTimerStart( xAutoReloadTimer, 0 );
+
+        /* The implementation of xTimerStart() uses the timer command queue,
+           and xTimerStart() will fail if the timer command queue gets full. 
+           The timer service task does not get created until the scheduler is 
+           started, so all commands sent to the command queue will stay in the
+           queue until after the scheduler has been started. Check both calls 
+           to xTimerStart() passed. */
+        if( ( xTimer1Started == pdPASS ) &amp;&amp; ( xTimer2Started == pdPASS ) )
+        {
+            /* Start the scheduler. */
+            vTaskStartScheduler();
+        }
+    }
+
+    /* As always, this line should not be reached. */
+    for( ;; );
+}
+</code></pre>
+<p><em><strong>Listing 6.5</strong></em> <em>Creating and starting the timers used in Example 6.1</em></p>
+<p>The timers' callback functions just print a message each time they are
+called. The implementation of the one-shot timer callback function is
+shown in Listing 6.6. The implementation of the auto-reload timer
+callback function is shown in Listing 6.7.</p>
+<p><a name="list6.5" title="Listing 6.6 The callback function used by the one-shot timer in Example 6.1"></a></p>
+<pre><code class="language-c">static void prvOneShotTimerCallback( TimerHandle_t xTimer )
+{
+    TickType_t xTimeNow;
+
+    /* Obtain the current tick count. */
+    xTimeNow = xTaskGetTickCount();
+
+    /* Output a string to show the time at which the callback was executed. */
+    vPrintStringAndNumber( "One-shot timer callback executing", xTimeNow );
+
+    /* File scope variable. */
+    ulCallCount++;
+}
+</code></pre>
+<p><em><strong>Listing 6.6</strong></em> <em>The callback function used by the one-shot timer in Example 6.1</em></p>
+<p><a name="list6.7" title="Listing 6.7 The callback function used by the auto-reload timer in Example 6.1"></a></p>
+<pre><code class="language-c">static void prvAutoReloadTimerCallback( TimerHandle_t xTimer )
+{
+    TickType_t xTimeNow;
+
+    /* Obtain the current tick count. */ 
+    xTimeNow = xTaskGetTickCount();
+
+    /* Output a string to show the time at which the callback was executed. */
+    vPrintStringAndNumber( "Auto-reload timer callback executing", xTimeNow);
+
+    ulCallCount++;
+}
+</code></pre>
+<p><em><strong>Listing 6.7</strong></em> <em>The callback function used by the auto-reload timer in Example 6.1</em></p>
+<p>Executing this example produces the output shown in Figure 6.7. Figure 6.7
+shows the auto-reload timer's callback function executing with a fixed
+period of 500 ticks (<code>mainAUTO_RELOAD_TIMER_PERIOD</code> is set to 500 in
+Listing 6.5), and the one-shot timer's callback function executing only
+once, when the tick count is 3333 (<code>mainONE_SHOT_TIMER_PERIOD</code> is set to
+3333 in Listing 6.5).</p>
+<p><a name="fig6.7" title="Figure 6.7 The output produced when Example 6.1 is executed"></a></p>
+<hr />
+<p><img src="media/image44.jpg" alt="" /><br />
+<em><strong>Figure 6.7</strong></em> <em>The output produced when Example 6.1 is executed</em></p>
+<hr />
+<h2 id="66-the-timer-id"><a class="header" href="#66-the-timer-id">6.6 The Timer ID</a></h2>
+<p>Each software timer has an ID, which is a tag value that can be used by
+the application writer for any purpose. The ID is stored in a void
+pointer (<code>void *</code>), so it can store an integer value directly, point to any
+other object, or be used as a function pointer.</p>
+<p>An initial value is assigned to the ID when the software timer is
+created, after which the ID can be updated using the <code>vTimerSetTimerID()</code>
+API function, and queried using the <code>pvTimerGetTimerID()</code> API function.</p>
+<p>Unlike other software timer API functions, <code>vTimerSetTimerID()</code> and
+<code>pvTimerGetTimerID()</code> access the software timer directly—they do not send
+a command to the timer command queue.</p>
+<h3 id="661-the-vtimersettimerid-api-function"><a class="header" href="#661-the-vtimersettimerid-api-function">6.6.1 The vTimerSetTimerID() API Function</a></h3>
+<p><a name="list6.8" title="Listing 6.8 The vTimerSetTimerID() API function prototype"></a></p>
+<pre><code class="language-c">void vTimerSetTimerID( const TimerHandle_t xTimer, void *pvNewID );
+</code></pre>
+<p><em><strong>Listing 6.8</strong></em> <em>The vTimerSetTimerID() API function prototype</em></p>
+<p><strong>vTimerSetTimerID() parameters</strong></p>
+<ul>
+<li>
+<p><code>xTimer</code></p>
+<p>The handle of the software timer being updated with a new ID value.
+The handle will have been returned from the call to <code>xTimerCreate()</code> used
+to create the software timer.</p>
+</li>
+<li>
+<p><code>pvNewID</code></p>
+<p>The value to which the software timer's ID will be set.</p>
+</li>
+</ul>
+<h3 id="662-the-pvtimergettimerid-api-function"><a class="header" href="#662-the-pvtimergettimerid-api-function">6.6.2 The pvTimerGetTimerID() API Function</a></h3>
+<p><a name="list6.9" title="Listing 6.9 The pvTimerGetTimerID() API function prototype"></a></p>
+<pre><code class="language-c">void *pvTimerGetTimerID( const TimerHandle_t xTimer );
+</code></pre>
+<p><em><strong>Listing 6.9</strong></em> <em>The pvTimerGetTimerID() API function prototype</em></p>
+<p><strong>pvTimerGetTimerID() parameters and return value</strong></p>
+<ul>
+<li>
+<p><code>xTimer</code></p>
+<p>The handle of the software timer being queried. The handle will have
+been returned from the call to <code>xTimerCreate()</code> used to create the
+software timer.</p>
+</li>
+<li>
+<p>Return value</p>
+<p>The ID of the software timer being queried.</p>
+</li>
+</ul>
+<h2 id="-1"><a class="header" href="#-1"><a name="example6.2" title="Example 6.2 Using the callback function parameter and the software timer ID"></a></a></h2>
+<p><em><strong>Example 6.2</strong></em> <em>Using the callback function parameter and the software timer ID</em></p>
+<hr />
+<p>The same callback function can be assigned to more than one software
+timer. When that is done, the callback function parameter is used to
+determine which software timer expired.</p>
+<p>Example 6.1 used two separate callback functions; one callback function
+was used by the one-shot timer, and the other callback function was used
+by the auto-reload timer. Example 6.2 creates similar functionality to
+that created by Example 6.1, but assigns a single callback function to
+both software timers.</p>
+<p>The <code>main()</code> function used by Example 6.2 is almost identical to the <code>main()</code>
+function used in Example 6.1. The only difference is where the software
+timers are created. This difference is shown in Listing 6.10, where
+<code>prvTimerCallback()</code> is used as the callback function for both timers.</p>
+<p><a name="list6.10" title="Listing 6.10 Creating the timers used in Example 6.2"></a></p>
+<pre><code class="language-c">/* Create the one shot timer software timer, storing the handle in 
+   xOneShotTimer. */
+xOneShotTimer = xTimerCreate( "OneShot",
+                              mainONE_SHOT_TIMER_PERIOD,
+                              pdFALSE, 
+                              /* The timer's ID is initialized to NULL. */
+                              NULL,
+                              /* prvTimerCallback() is used by both timers. */
+                              prvTimerCallback );
+
+/* Create the auto-reload software timer, storing the handle in 
+   xAutoReloadTimer */
+xAutoReloadTimer = xTimerCreate( "AutoReload",
+                                 mainAUTO_RELOAD_TIMER_PERIOD,
+                                 pdTRUE, 
+                                 /* The timer's ID is initialized to NULL. */
+                                 NULL,
+                                 /* prvTimerCallback() is used by both timers. */
+                                 prvTimerCallback );
+</code></pre>
+<p><em><strong>Listing 6.10</strong></em> <em>Creating the timers used in Example 6.2</em></p>
+<p><code>prvTimerCallback()</code> will execute when either timer expires. The
+implementation of <code>prvTimerCallback()</code> uses the function's parameter to
+determine if it was called because the one-shot timer expired, or
+because the auto-reload timer expired.</p>
+<p><code>prvTimerCallback()</code> also demonstrates how to use the software timer ID as
+timer specific storage; each software timer keeps a count of the number
+of times it has expired in its own ID, and the auto-reload timer uses
+the count to stop itself the fifth time it executes.</p>
+<p>The implementation of <code>prvTimerCallback()</code> is shown in Listing 6.9.</p>
+<p><a name="list6.11" title="Listing 6.11 The timer callback function used in Example 6.2"></a></p>
+<pre><code class="language-c">static void prvTimerCallback( TimerHandle_t xTimer )
+{
+    TickType_t xTimeNow;
+    uint32_t ulExecutionCount;
+
+    /* A count of the number of times this software timer has expired is 
+       stored in the timer's ID. Obtain the ID, increment it, then save it as 
+       the new ID value. The ID is a void pointer, so is cast to a uint32_t. */
+    ulExecutionCount = ( uint32_t ) pvTimerGetTimerID( xTimer );
+    ulExecutionCount++;
+    vTimerSetTimerID( xTimer, ( void * ) ulExecutionCount );
+
+    /* Obtain the current tick count. */
+    xTimeNow = xTaskGetTickCount();
+
+    /* The handle of the one-shot timer was stored in xOneShotTimer when the 
+       timer was created. Compare the handle passed into this function with 
+       xOneShotTimer to determine if it was the one-shot or auto-reload timer 
+       that expired, then output a string to show the time at which the 
+       callback was executed. */
+    if( xTimer == xOneShotTimer )
+    {
+        vPrintStringAndNumber( "One-shot timer callback executing", xTimeNow );
+    }
+    else
+    {
+        /* xTimer did not equal xOneShotTimer, so it must have been the 
+           auto-reload timer that expired. */
+        vPrintStringAndNumber( "Auto-reload timer callback executing", xTimeNow);
+
+        if( ulExecutionCount == 5 )
+        {
+            /* Stop the auto-reload timer after it has executed 5 times. This
+               callback function executes in the context of the RTOS daemon 
+               task so must not call any functions that might place the daemon
+               task into the Blocked state. Therefore a block time of 0 is 
+               used. */
+            xTimerStop( xTimer, 0 );
+        }
+    }
+}
+</code></pre>
+<p><em><strong>Listing 6.11</strong></em> <em>The timer callback function used in Example 6.2</em></p>
+<p>The output produced by Example 6.2 is shown in Figure 6.8. It can be seen
+that the auto-reload timer only executes five times.</p>
+<p><a name="fig6.8" title="Figure 6.8 The output produced when Example 6.2 is executed"></a></p>
+<hr />
+<p><img src="media/image45.jpg" alt="" /><br />
+<em><strong>Figure 6.8</strong></em> <em>The output produced when Example 6.2 is executed</em></p>
+<hr />
+<h2 id="67-changing-the-period-of-a-timer"><a class="header" href="#67-changing-the-period-of-a-timer">6.7 Changing the Period of a Timer</a></h2>
+<p>Every official FreeRTOS port is provided with one or more example
+projects. Most example projects are self-checking, and an LED is used to
+give visual feedback of the project's status; if the self-checks have
+always passed then the LED is toggled slowly, if a self-check has ever
+failed then the LED is toggled quickly.</p>
+<p>Some example projects perform the self-checks in a task, and use the
+<code>vTaskDelay()</code> function to control the rate at which the LED toggles.
+Other example projects perform the self-checks in a software timer
+callback function, and use the timer's period to control the rate at
+which the LED toggles.</p>
+<h3 id="671-the-xtimerchangeperiod-api-function"><a class="header" href="#671-the-xtimerchangeperiod-api-function">6.7.1 The xTimerChangePeriod() API Function</a></h3>
+<p>The period of a software timer is changed using the <code>xTimerChangePeriod()</code> function.</p>
+<p>If <code>xTimerChangePeriod()</code> is used to change the period of a timer that is
+already running, then the timer will use the new period value to
+recalculate its expiry time. The recalculated expiry time is relative to
+when <code>xTimerChangePeriod()</code> was called, not relative to when the timer was
+originally started.</p>
+<p>If <code>xTimerChangePeriod()</code> is used to change the period of a timer that is
+in the Dormant state (a timer that is not running), then the timer will
+calculate an expiry time, and transition to the Running state (the timer
+will start running).</p>
+<blockquote>
+<p><em>Note: Never call <code>xTimerChangePeriod()</code> from an interrupt service
+routine. The interrupt-safe version <code>xTimerChangePeriodFromISR()</code> should
+be used in its place.</em></p>
+</blockquote>
+<p><a name="list6.12" title="Listing 6.12 The xTimerChangePeriod() API function prototype"></a></p>
+<pre><code class="language-c">BaseType_t xTimerChangePeriod( TimerHandle_t xTimer,
+                               TickType_t xNewPeriod,
+                               TickType_t xTicksToWait );
+</code></pre>
+<p><em><strong>Listing 6.12</strong></em> <em>The xTimerChangePeriod() API function prototype</em></p>
+<p><strong>xTimerChangePeriod() parameters and return value</strong></p>
+<ul>
+<li>
+<p><code>xTimer</code></p>
+<p>The handle of the software timer being updated with a new period
+value. The handle will have been returned from the call to
+<code>xTimerCreate()</code> used to create the software timer.</p>
+</li>
+<li>
+<p><code>xTimerPeriodInTicks</code></p>
+<p>The new period for the software timer, specified in ticks. The
+<code>pdMS_TO_TICKS()</code> macro can be used to convert a time specified in
+milliseconds into a time specified in ticks.</p>
+</li>
+<li>
+<p><code>xTicksToWait</code></p>
+<p><code>xTimerChangePeriod()</code> uses the timer command queue to send the
+'change period' command to the daemon task. <code>xTicksToWait</code> specifies the
+maximum amount of time the calling task should remain in the Blocked
+state to wait for space to become available on the timer command queue,
+if the queue is already full.</p>
+<p><code>xTimerChangePeriod()</code> will return immediately if <code>xTicksToWait</code> is zero
+and the timer command queue is already full.</p>
+<p>The macro <code>pdMS_TO_TICKS()</code> can be used to convert a time specified in
+milliseconds into a time specified in ticks.</p>
+<p>If <code>INCLUDE_vTaskSuspend</code> is set to 1 in FreeRTOSConfig.h, then setting
+<code>xTicksToWait</code> to <code>portMAX_DELAY</code> will result in the calling task remaining
+in the Blocked state indefinitely (without a timeout) to wait for space
+to become available in the timer command queue.</p>
+<p>If <code>xTimerChangePeriod()</code> is called before the scheduler has been
+started, then the value of <code>xTicksToWait</code> is ignored, and
+<code>xTimerChangePeriod()</code> behaves as if <code>xTicksToWait</code> had been set to zero.</p>
+</li>
+<li>
+<p>Returned value</p>
+<p>There are two possible return values:</p>
+<ul>
+<li>
+<p><code>pdPASS</code></p>
+<p><code>pdPASS</code> will be returned only if data was successfully sent to the
+timer command queue.</p>
+<p>If a block time was specified (<code>xTicksToWait</code> was not zero), then it is
+possible the calling task was placed into the Blocked state to wait for
+space to become available in the timer command queue before the function
+returned, but data was successfully written to the timer command queue
+before the block time expired.</p>
+</li>
+<li>
+<p><code>pdFAIL</code></p>
+<p><code>pdFAIL</code> will be returned if the 'change period' command could not be
+written to the timer command queue because the queue was already
+full.</p>
+<p>If a block time was specified (<code>xTicksToWait</code> was not zero) then the
+calling task will have been placed into the Blocked state to wait for
+the daemon task to make room in the queue, but the specified block time
+expired before that happened.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p>Listing 6.13 shows how the FreeRTOS examples that include self-checking
+functionality in a software timer callback function use
+<code>xTimerChangePeriod()</code> to increase the rate at which an LED toggles if a
+self-check fails. The software timer that performs the self-checks is
+referred to as the 'check timer'.</p>
+<p><a name="list6.13" title="Listing 6.13 Using xTimerChangePeriod()"></a></p>
+<pre><code class="language-c">/* The check timer is created with a period of 3000 milliseconds, resulting 
+   in the LED toggling every 3 seconds. If the self-checking functionality 
+   detects an unexpected state, then the check timer's period is changed to 
+   just 200 milliseconds, resulting in a much faster toggle rate. */
+const TickType_t xHealthyTimerPeriod = pdMS_TO_TICKS( 3000 );
+const TickType_t xErrorTimerPeriod = pdMS_TO_TICKS( 200 );
+
+/* The callback function used by the check timer. */
+static void prvCheckTimerCallbackFunction( TimerHandle_t xTimer )
+{
+    static BaseType_t xErrorDetected = pdFALSE;
+
+    if( xErrorDetected == pdFALSE )
+    {
+        /* No errors have yet been detected. Run the self-checking function 
+           again. The function asks each task created by the example to report
+           its own status, and also checks that all the tasks are actually 
+           still running (and so able to report their status correctly). */
+        if( CheckTasksAreRunningWithoutError() == pdFAIL )
+        {
+            /* One or more tasks reported an unexpected status. An error might 
+               have occurred. Reduce the check timer's period to increase the 
+               rate at which this callback function executes, and in so doing 
+               also increase the rate at which the LED is toggled. This 
+               callback function is executing in the context of the RTOS daemon
+               task, so a block time of 0 is used to ensure the Daemon task 
+               never enters the Blocked state. */
+            xTimerChangePeriod( 
+                  xTimer,            /* The timer being updated */
+                  xErrorTimerPeriod, /* The new period for the timer */
+                  0 );               /* Do not block when sending this command */
+        }
+
+        /* Latch that an error has already been detected. */
+        xErrorDetected = pdTRUE;
+    }
+
+    /* Toggle the LED. The rate at which the LED toggles will depend on how 
+       often this function is called, which is determined by the period of the
+       check timer. The timer's period will have been reduced from 3000ms to 
+       just 200ms if CheckTasksAreRunningWithoutError() has ever returned 
+       pdFAIL. */
+    ToggleLED();
+}
+</code></pre>
+<p><em><strong>Listing 6.13</strong></em> <em>Using xTimerChangePeriod()</em></p>
+<h2 id="68-resetting-a-software-timer"><a class="header" href="#68-resetting-a-software-timer">6.8 Resetting a Software Timer</a></h2>
+<p>Resetting a software timer means to re-start the timer; the timer's
+expiry time is recalculated to be relative to when the timer was reset,
+rather than when the timer was originally started. This is demonstrated
+by Figure 6.9, which shows a timer that has a period of 6 being started,
+then reset twice, before eventually expiring and executing its callback
+function.</p>
+<p><a name="fig6.9" title="Figure 6.9 Starting and resetting a software timer that has a period of 6 ticks"></a></p>
+<hr />
+<p><img src="media/image46.png" alt="" /><br />
+<em><strong>Figure 6.9</strong></em> <em>Starting and resetting a software timer that has a period of 6 ticks</em></p>
+<hr />
+<p>Referring to Figure 6.9:</p>
+<ul>
+<li>
+<p>Timer 1 is started at time t1. It has a period of 6, so the time at
+which it will execute its callback function is originally calculated
+to be t7, which is 6 ticks after it was started.</p>
+</li>
+<li>
+<p>Timer 1 is reset before time t7 is reached, so before it had expired
+and executed its callback function. Timer 1 is reset at time t5, so
+the time at which it will execute its callback function is
+re-calculated to be t11, which is 6 ticks after it was reset.</p>
+</li>
+<li>
+<p>Timer 1 is reset again before time t11, so again before it had
+expired and executed its callback function. Timer 1 is reset at time
+t9, so the time at which it will execute its callback function is
+re-calculated to be t15, which is 6 ticks after it was last reset.</p>
+</li>
+<li>
+<p>Timer 1 is not reset again, so it expires at time t15, and its
+callback function is executed accordingly.</p>
+</li>
+</ul>
+<h3 id="681-the-xtimerreset-api-function"><a class="header" href="#681-the-xtimerreset-api-function">6.8.1 The xTimerReset() API Function</a></h3>
+<p>A timer is reset using the <code>xTimerReset()</code> API function.</p>
+<p><code>xTimerReset()</code> can also be used to start a timer that is in the Dormant state.</p>
+<blockquote>
+<p><em>Note: Never call <code>xTimerReset()</code> from an interrupt service routine. The
+interrupt-safe version <code>xTimerResetFromISR()</code> should be used in its
+place.</em></p>
+</blockquote>
+<p><a name="list6.14" title="Listing 6.14 The xTimerReset() API function prototype"></a></p>
+<pre><code class="language-c">BaseType_t xTimerReset( TimerHandle_t xTimer, TickType_t xTicksToWait );
+</code></pre>
+<p><em><strong>Listing 6.14</strong></em> <em>The xTimerReset() API function prototype</em></p>
+<p><strong>xTimerReset() parameters and return value</strong></p>
+<ul>
+<li>
+<p><code>xTimer</code></p>
+<p>The handle of the software timer being reset or started. The handle
+will have been returned from the call to <code>xTimerCreate()</code> used to create
+the software timer.</p>
+</li>
+<li>
+<p><code>xTicksToWait</code></p>
+<p><code>xTimerChangePeriod()</code> uses the timer command queue to send the
+'reset' command to the daemon task. <code>xTicksToWait</code> specifies the maximum
+amount of time the calling task should remain in the Blocked state to
+wait for space to become available on the timer command queue, if
+the queue is already full.</p>
+<p><code>xTimerReset()</code> will return immediately if <code>xTicksToWait</code> is zero and the
+timer command queue is already full.</p>
+<p>If <code>INCLUDE_vTaskSuspend</code> is set to 1 in <code>FreeRTOSConfig.h</code> then setting
+<code>xTicksToWait</code> to <code>portMAX_DELAY</code> will result in the calling task remaining
+in the Blocked state indefinitely (without a timeout) to wait for space
+to become available in the timer command queue.</p>
+</li>
+<li>
+<p>Returned value</p>
+<p>There are two possible return values:</p>
+<ul>
+<li>
+<p><code>pdPASS</code></p>
+<p><code>pdPASS</code> will be returned only if data was successfully sent to the
+timer command queue.</p>
+<p>If a block time was specified (<code>xTicksToWait</code> was not zero), then it is
+possible the calling task was placed into the Blocked state to wait for
+space to become available in the timer command queue before the function
+returned, but data was successfully written to the timer command queue
+before the block time expired.</p>
+<p><code>pdFAIL</code></p>
+<p><code>pdFAIL</code> will be returned if the 'reset' command could not be written
+to the timer command queue because the queue was already full.</p>
+<p>If a block time was specified (<code>xTicksToWait</code> was not zero) then the
+calling task will have been placed into the Blocked state to wait for
+the daemon task to make room in the queue, but the specified block time
+expired before that happened.</p>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="-2"><a class="header" href="#-2"><a name="example6.3" title="Example 6.3 Resetting a software timer"></a></a></h2>
+<p><em><strong>Example 6.3</strong></em> <em>Resetting a software timer</em></p>
+<hr />
+<p>This example simulates the behavior of the backlight on a cell phone. The backlight:</p>
+<ul>
+<li>
+<p>Turns on when a key is pressed.</p>
+</li>
+<li>
+<p>Remains on provided further keys are pressed within a certain time period.</p>
+</li>
+<li>
+<p>Automatically turns off if no key presses are made within a certain time period.</p>
+</li>
+</ul>
+<p>A one-shot software timer is used to implement this behavior:</p>
+<ul>
+<li>
+<p>The [simulated] backlight is turned on when a key is pressed, and
+turned off in the software timer's callback function.</p>
+</li>
+<li>
+<p>The software timer is reset each time a key is pressed.</p>
+</li>
+<li>
+<p>The time period during which a key must be pressed to prevent the
+backlight being turned off is therefore equal to the period of the
+software timer; if the software timer is not reset by a key press
+before the timer expires, then the timer's callback function
+executes, and the backlight is turned off.</p>
+</li>
+</ul>
+<p>The <code>xSimulatedBacklightOn</code> variable holds the backlight state.
+<code>xSimulatedBacklightOn</code> is set to <code>pdTRUE</code> to indicate the backlight is on,
+and <code>pdFALSE</code> to indicate the backlight is off.</p>
+<p>The software timer callback function is shown in Listing 6.15.</p>
+<p><a name="list6.15" title="Listing 6.15 The callback function for the one-shot timer used in Example 6.3"></a></p>
+<pre><code class="language-c">static void prvBacklightTimerCallback( TimerHandle_t xTimer )
+{
+    TickType_t xTimeNow = xTaskGetTickCount();
+
+    /* The backlight timer expired, turn the backlight off. */
+    xSimulatedBacklightOn = pdFALSE;
+
+    /* Print the time at which the backlight was turned off. */
+    vPrintStringAndNumber(
+            "Timer expired, turning backlight OFF at time\t\t", xTimeNow );
+}
+</code></pre>
+<p><em><strong>Listing 6.15</strong></em> <em>The callback function for the one-shot timer used in Example 6.3</em></p>
+<p>Example 6.3 creates a task to poll the keyboard<sup class="footnote-reference"><a href="#11">2</a></sup>. The task is shown
+in Listing 6.16, but for the reasons described in the next paragraph,
+Listing 6.16 is not intended to be representative of an optimal design.</p>
+<div class="footnote-definition" id="11"><sup class="footnote-definition-label">2</sup>
+<p>Printing to the Windows console, and reading keys from the
+Windows console, both result in the execution of Windows system
+calls. Windows system calls, including use of the Windows console,
+disks, or TCP/IP stack, can adversely affect the behavior of the
+FreeRTOS Windows port, and should normally be avoided.*</p>
+</div>
+<p>Using FreeRTOS allows your application to be event driven. Event driven
+designs use processing time very efficiently, because processing time is
+only used if an event has occurred, and processing time is not wasted
+polling for events that have not occurred. Example 6.3 could not be made
+event driven because it is not practical to process keyboard interrupts
+when using the FreeRTOS Windows port, so the much less efficient polling
+technique had to be used instead. If Listing 6.16 was an interrupt service
+routine, then <code>xTimerResetFromISR()</code> would be used in place of
+<code>xTimerReset()</code>.</p>
+<p><a name="list6.16" title="Listing 6.16 The task used to reset the software timer in Example 6.3"></a></p>
+<pre><code class="language-c">static void vKeyHitTask( void *pvParameters )
+{
+    const TickType_t xShortDelay = pdMS_TO_TICKS( 50 );
+    TickType_t xTimeNow;
+
+    vPrintString( "Press a key to turn the backlight on.\r\n" );
+
+    /* Ideally an application would be event driven, and use an interrupt to 
+       process key presses. It is not practical to use keyboard interrupts 
+       when using the FreeRTOS Windows port, so this task is used to poll for 
+       a key press. */
+    for( ;; )
+    {
+        /* Has a key been pressed? */
+        if( _kbhit() != 0 )
+        {
+            /* A key has been pressed. Record the time. */
+            xTimeNow = xTaskGetTickCount();
+
+            if( xSimulatedBacklightOn == pdFALSE )
+            {
+
+                /* The backlight was off, so turn it on and print the time at 
+                   which it was turned on. */
+                xSimulatedBacklightOn = pdTRUE;
+                vPrintStringAndNumber(
+                    "Key pressed, turning backlight ON at time\t\t", 
+                    xTimeNow );
+            }
+            else
+            {
+                /* The backlight was already on, so print a message to say the
+                   timer is about to be reset and the time at which it was 
+                   reset. */
+                vPrintStringAndNumber(
+                    "Key pressed, resetting software timer at time\t\t", 
+                    xTimeNow );
+            }
+
+            /* Reset the software timer. If the backlight was previously off, 
+               then this call will start the timer. If the backlight was 
+               previously on, then this call will restart the timer. A real 
+               application may read key presses in an interrupt. If this 
+               function was an interrupt service routine then 
+               xTimerResetFromISR() must be used instead of xTimerReset(). */
+            xTimerReset( xBacklightTimer, xShortDelay );
+
+            /* Read and discard the key that was pressed – it is not required 
+               by this simple example. */
+            ( void ) _getch();
+        }
+    }
+}
+</code></pre>
+<p><em><strong>Listing 6.16</strong></em> <em>The task used to reset the software timer in Example 6.3</em></p>
+<p>The output produced when Example 6.3 is executed is shown in Figure 6.10.
+With reference to Figure 6.10:</p>
+<ul>
+<li>
+<p>The first key press occurred when the tick count was 812. At that
+time the backlight was turned on, and the one-shot timer was
+started.</p>
+</li>
+<li>
+<p>Further key presses occurred when the tick count was 1813, 3114,
+4015 and 5016. All of these key presses resulted in the timer being
+reset before the timer had expired.</p>
+</li>
+<li>
+<p>The timer expired when the tick count was 10016. At that time the
+backlight was turned off.</p>
+</li>
+</ul>
+<p><a name="fig6.10" title="Figure 6.10 The output produced when Example 6.3 is executed"></a></p>
+<hr />
+<p><img src="media/image47.jpg" alt="" /><br />
+<em><strong>Figure 6.10</strong></em> <em>The output produced when Example 6.3 is executed</em></p>
+<hr />
+<p>It can be seen in Figure 6.10 that the timer had a period of 5000 ticks;
+the backlight was turned off exactly 5000 ticks after a key was last
+pressed, so 5000 ticks after the timer was last reset.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="ch05.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="ch07.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="ch05.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="ch07.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

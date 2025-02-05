@@ -1,0 +1,1025 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Developer Support</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title"></h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="12-developer-support"><a class="header" href="#12-developer-support">12 Developer Support</a></h1>
+<h2 id="121-introduction"><a class="header" href="#121-introduction">12.1 Introduction</a></h2>
+<p>This chapter highlights a set of features that are included to maximize
+productivity by:</p>
+<ul>
+<li>Providing insight into how an application is behaving.</li>
+<li>Highlighting opportunities for optimization.</li>
+<li>Trapping errors at the point at which they occur.</li>
+</ul>
+<h2 id="122-configassert"><a class="header" href="#122-configassert">12.2 configASSERT()</a></h2>
+<p>In C, the macro <code>assert()</code> is used to verify an <em>assertion</em> (an
+assumption) made by the program. The assertion is written as a C
+expression, and if the expression evaluates to false (0), then the
+assertion has deemed to have failed. For example, Listing 12.1 tests the
+assertion that the pointer <code>pxMyPointer</code> is not NULL.</p>
+<p><a name="list12.1" title="Listing 12.1 Using the standard C assert() macro to check pxMyPointer is not NULL"></a></p>
+<pre><code class="language-c">/* Test the assertion that pxMyPointer is not NULL */
+assert( pxMyPointer != NULL );
+</code></pre>
+<p><em><strong>Listing 12.1</strong></em> <em>Using the standard C assert() macro to check pxMyPointer is not NULL</em></p>
+<p>The application writer specifies the action to take if an assertion
+fails by providing an implementation of the <code>assert()</code> macro.</p>
+<p>The FreeRTOS source code does not call <code>assert()</code>, because <code>assert()</code> is not
+available with all the compilers with which FreeRTOS is compiled.
+Instead, the FreeRTOS source code contains lots of calls to a macro
+called <code>configASSERT()</code>, which can be defined by the application writer in
+<code>FreeRTOSConfig.h</code>, and behaves exactly like the standard C <code>assert()</code>.</p>
+<p>A failed assertion must be treated as a fatal error. Do not attempt to
+execute past a line that has failed an assertion.</p>
+<blockquote>
+<p><em>Using <code>configASSERT()</code> improves productivity by immediately trapping and
+identifying many of the most common sources of error. It is strongly
+advised to have <code>configASSERT()</code> defined while developing or debugging a
+FreeRTOS application.</em></p>
+</blockquote>
+<p>Defining <code>configASSERT()</code> will greatly assist in run-time debugging, but
+will also increase the application code size, and therefore slow down
+its execution. If a definition of <code>configASSERT()</code> is not provided, then
+the default empty definition will be used, and all the calls to
+<code>configASSERT()</code> will be completely removed by the C pre-processor.</p>
+<h3 id="1221-example-configassert-definitions"><a class="header" href="#1221-example-configassert-definitions">12.2.1 Example configASSERT() definitions</a></h3>
+<p>The definition of <code>configASSERT()</code> shown in Listing 12.2 is useful when an
+application is being executed under the control of a debugger. It will
+halt execution on any line that fails an assertion, so the line that
+failed the assertion will be the line displayed by the debugger when the
+debug session is paused.</p>
+<p><a name="list12.2" title="Listing 12.2 A simple configASSERT() definition useful when executing under the control of a debugger"></a></p>
+<pre><code class="language-c">/* Disable interrupts so the tick interrupt stops executing, then sit
+   in a loop so execution does not move past the line that failed the
+   assertion. If the hardware supports a debug break instruction, then the
+   debug break instruction can be used in place of the for() loop. */
+
+#define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for(;;); }
+</code></pre>
+<p><em><strong>Listing 12.2</strong></em> <em>A simple configASSERT() definition useful when executing under the control of a debugger</em></p>
+<p>The definition of <code>configASSERT()</code> shown in Listing 12.3 is useful when an
+application is not being executed under the control of a debugger. It
+prints out, or otherwise records, the source code line that failed an
+assertion. The line that failed the assertion is identified using the
+standard C <code>__FILE__</code> macro to obtain the name of the source file, and
+the standard C <code>__LINE__</code> macro to obtain the line number within the
+source file.</p>
+<p><a name="list12.3" title="Listing 12.3 A configASSERT() definition that records the source code line that failed an assertion"></a></p>
+<pre><code class="language-c">/* This function must be defined in a C source file, not the FreeRTOSConfig.h 
+   header file. */
+void vAssertCalled( const char *pcFile, uint32_t ulLine )
+{
+    /* Inside this function, pcFile holds the name of the source file that 
+       contains the line that detected the error, and ulLine holds the line 
+       number in the source file. The pcFile and ulLine values can be printed 
+       out, or otherwise recorded, before the following infinite loop is 
+       entered. */
+    RecordErrorInformationHere( pcFile, ulLine );
+
+    /* Disable interrupts so the tick interrupt stops executing, then sit in a 
+       loop so execution does not move past the line that failed the assertion. */
+    taskDISABLE_INTERRUPTS();
+    for( ;; );
+}
+/*-----------------------------------------------------------*/
+
+/* These following two lines must be placed in FreeRTOSConfig.h. */
+extern void vAssertCalled( const char *pcFile, unsigned long ulLine );
+#define configASSERT( x ) if( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ )
+</code></pre>
+<p><em><strong>Listing 12.3</strong></em> <em>A configASSERT() definition that records the source code line that failed an assertion</em></p>
+<h2 id="123-tracealyzer-for-freertos"><a class="header" href="#123-tracealyzer-for-freertos">12.3 Tracealyzer for FreeRTOS</a></h2>
+<p>Tracealyzer for FreeRTOS is a run-time diagnostic and optimization tool provided
+by our partner company, Percepio.</p>
+<p>Tracealyzer for FreeRTOS captures valuable dynamic behavior information, then
+presents the captured information in interconnected graphical views. The
+tool is also capable of displaying multiple synchronized views.</p>
+<p>The captured information is invaluable when analyzing, troubleshooting,
+or simply optimizing a FreeRTOS application.</p>
+<p>Tracealyzer for FreeRTOS can be used side-by-side with a traditional debugger, and
+complements the debugger's view with a higher level, time-based
+perspective.</p>
+<p><a name="fig12.1" title="Figure 12.1 FreeRTOS+Trace includes more than 20 interconnected views"></a>
+<a name="fig12.2" title="Figure 12.2 FreeRTOS+Trace main trace view - one of more than 20 interconnected trace views"></a>
+<a name="fig12.3" title="Figure 12.3 FreeRTOS+Trace CPU load view - one of more than 20 interconnected trace views"></a>
+<a name="fig12.4" title="Figure 12.4 FreeRTOS+Trace response time view - one of more than 20 interconnected trace views"></a>
+<a name="fig12.5" title="Figure 12.5 FreeRTOS+Trace user event plot view - one of more than 20 interconnected trace views"></a>
+<a name="fig12.6" title="Figure 12.6 FreeRTOS+Trace kernel object history view - one of more than 20 interconnected trace views"></a></p>
+<hr />
+<p><img src="media/image82.png" alt="" /><br />
+<em><strong>Figure 12.1</strong></em> <em>FreeRTOS+Trace includes more than 20 interconnected views</em></p>
+<p><img src="media/image83.png" alt="" /><br />
+<em><strong>Figure 12.2</strong></em> <em>FreeRTOS+Trace main trace view - one of more than 20 interconnected trace views</em></p>
+<p><img src="media/image84.png" alt="" /><br />
+<em><strong>Figure 12.3</strong></em> <em>FreeRTOS+Trace CPU load view - one of more than 20 interconnected trace views</em></p>
+<p><img src="media/image85.png" alt="" /><br />
+<em><strong>Figure 12.4</strong></em> <em>FreeRTOS+Trace response time view - one of more than 20 interconnected trace views</em></p>
+<p><img src="media/image86.png" alt="" /><br />
+<em><strong>Figure 12.5</strong></em> <em>FreeRTOS+Trace user event plot view - one of more than 20 interconnected trace views</em></p>
+<p><img src="media/image87.png" alt="" /><br />
+<em><strong>Figure 12.6</strong></em> <em>FreeRTOS+Trace kernel object history view - one of more than 20 interconnected trace views</em></p>
+<hr />
+<h2 id="124-debug-related-hook-callback-functions"><a class="header" href="#124-debug-related-hook-callback-functions">12.4 Debug Related Hook (Callback) Functions</a></h2>
+<h3 id="1241-malloc-failed-hook"><a class="header" href="#1241-malloc-failed-hook">12.4.1 Malloc failed hook</a></h3>
+<p>The malloc failed hook (or callback) was described in Chapter 3, Heap
+Memory Management.</p>
+<p>Defining a malloc failed hook ensures the application developer is
+notified immediately if an attempt to create a task, queue, semaphore or
+event group fails.</p>
+<h3 id="1242-stack-overflow-hook"><a class="header" href="#1242-stack-overflow-hook">12.4.2 Stack overflow hook</a></h3>
+<p>Details of the stack overflow hook are provided in section 13.3, Stack
+Overflow.</p>
+<p>Defining a stack overflow hook ensures the application developer is
+notified if the amount of stack used by a task exceeds the stack space
+allocated to the task.</p>
+<h2 id="125-viewing-run-time-and-task-state-information"><a class="header" href="#125-viewing-run-time-and-task-state-information">12.5 Viewing Run-time and Task State Information</a></h2>
+<h3 id="1251-task-run-time-statistics"><a class="header" href="#1251-task-run-time-statistics">12.5.1 Task Run-Time Statistics</a></h3>
+<p>Task run-time statistics provide information on the amount of processing
+time each task has received. A task's <em>run time</em> is the total time the
+task has been in the Running state since the application booted.</p>
+<p>Run-time statistics are intended to be used as a profiling and debugging
+aid during the development phase of a project. The information they
+provide is only valid until the counter used as the run-time statistics
+clock overflows. Collecting run-time statistics will increase the task
+context switch time.</p>
+<p>To obtain binary run-time statistics information, call the
+<code>uxTaskGetSystemState()</code> API function. To obtain run-time statistics
+information as a human readable ASCII table, call the
+<code>vTaskGetRunTimeStatistics()</code> helper function.</p>
+<h3 id="1252-the-run-time-statistics-clock"><a class="header" href="#1252-the-run-time-statistics-clock">12.5.2 The Run-Time Statistics Clock</a></h3>
+<p>Run-time statistics need to measure fractions of a tick period.
+Therefore, the RTOS tick count is not used as the run-time statistics
+clock, and the clock is instead provided by the application code. It is
+recommended to make the frequency of the run-time statistics clock
+between 10 and 100 times faster than the frequency of the tick
+interrupt. The faster the run-time statistics clock, the more accurate
+the statistics will be, but also the sooner the time value will
+overflow.</p>
+<p>Ideally, the time value will be generated by a free-running 32-bit
+peripheral timer/counter, the value of which can be read with no other
+processing overhead. If the available peripherals and clock speeds do
+not make that technique possible, then alternative, but less efficient,
+techniques include:</p>
+<ul>
+<li>
+<p>Configure a peripheral to generate a periodic interrupt at the
+desired run-time statistics clock frequency, and then use a count
+of the number of interrupts generated as the run-time statistics clock.</p>
+<p>This method is very inefficient if the periodic interrupt is only
+used for the purpose of providing a run-time statistics clock.
+However, if the application already uses a periodic interrupt with a
+suitable frequency, then it is simple and efficient to add a count
+of the number of interrupts generated into the existing interrupt
+service routine.</p>
+</li>
+<li>
+<p>Generate a 32-bit value by using the current value of a free running
+16-bit peripheral timer as the 32-bit value's least significant
+16-bits, and the number of times the timer has overflowed as the
+32-bit value's most significant 16-bits.</p>
+</li>
+</ul>
+<p>It is possible, with appropriate and somewhat complex manipulation, to
+generate a run-time statistics clock by combining the RTOS tick count
+with the current value of an ARM Cortex-M SysTick timer. Some of the
+demo projects in the FreeRTOS download demonstrate how this is achieved.</p>
+<h3 id="1253-configuring-an-application-to-collect-run-time-statistics"><a class="header" href="#1253-configuring-an-application-to-collect-run-time-statistics">12.5.3 Configuring an Application to Collect Run-Time Statistics</a></h3>
+<p>Below are details on the macros necessary to collect task run-time
+statistics. Originally, the macros were intended to be included in
+the RTOS port layer, which is why the macros are prefixed 'port', but it
+has proven more practical to define them in <code>FreeRTOSConfig.h</code>.</p>
+<p><strong>Macros used in the collection of run-time statistics</strong></p>
+<ul>
+<li>
+<p><code>configGENERATE_RUN_TIME_STATS</code></p>
+<p>This macro must be set to 1 in FreeRTOSConfig.h. When this macro is
+set to 1 the scheduler will call the other macros detailed in this section
+at the appropriate times.</p>
+</li>
+<li>
+<p><code>portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()</code></p>
+<p>This macro must be provided to initialize whichever peripheral is
+used to provide the run-time statistics clock.</p>
+</li>
+<li>
+<p><code>portGET_RUN_TIME_COUNTER_VALUE()</code>, or <code>portALT_GET_RUN_TIME_COUNTER_VALUE(Time)</code></p>
+<p>One of these two macros must be provided to return the current
+run-time statistics clock value. This is the total time the application
+has been running, in run-time statistics clock units, since the
+application first booted.</p>
+<p>If the first macro is used, it must be defined to evaluate to the
+current clock value. If the second macro is used, it must be defined to
+set its 'Time' parameter to the current clock value.</p>
+</li>
+</ul>
+<h3 id="1254-the-uxtaskgetsystemstate-api-function"><a class="header" href="#1254-the-uxtaskgetsystemstate-api-function">12.5.4 The uxTaskGetSystemState() API Function</a></h3>
+<p><code>uxTaskGetSystemState()</code> provides a snapshot of status information for
+each task under the control of the FreeRTOS scheduler. The information
+is provided as an array of <code>TaskStatus_t</code> structures, with one index in
+the array for each task. <code>TaskStatus_t</code> is described by Listing 12.5 and
+below.</p>
+<p><a name="list12.4" title="Listing 12.4 The uxTaskGetSystemState() API function prototype"></a></p>
+<pre><code class="language-c">UBaseType_t uxTaskGetSystemState( TaskStatus_t * const pxTaskStatusArray,
+                                  const UBaseType_t uxArraySize,
+                                  configRUN_TIME_COUNTER_TYPE * const pulTotalRunTime );
+</code></pre>
+<p><em><strong>Listing 12.4</strong></em> <em>The uxTaskGetSystemState() API function prototype</em></p>
+<blockquote>
+<p>Note: <code>configRUN_TIME_COUNTER_TYPE</code> defaults to <code>uint32_t</code> for backward compatibility, but can be
+overridden in FreeRTOSConfig.h if <code>uint32_t</code> is too restrictive.</p>
+</blockquote>
+<p><strong>uxTaskGetSystemState() parameters and return value</strong></p>
+<ul>
+<li>
+<p><code>pxTaskStatusArray</code></p>
+<p>A pointer to an array of <code>TaskStatus_t</code> structures.</p>
+<p>The array must contain at least one <code>TaskStatus_t</code> structure for each
+task. The number of tasks can be determined using the
+<code>uxTaskGetNumberOfTasks()</code> API function.</p>
+<p>The <code>TaskStatus_t</code> structure is shown in Listing 12.5, and the
+TaskStatus_t structure members are described in the next list.</p>
+</li>
+<li>
+<p><code>uxArraySize</code></p>
+<p>The size of the array pointed to by the <code>pxTaskStatusArray</code> parameter.
+The size is specified as the number of indexes in the array (the number
+of <code>TaskStatus_t</code> structures contained in the array), not by the number of
+bytes in the array.</p>
+</li>
+<li>
+<p><code>pulTotalRunTime</code></p>
+<p>If <code>configGENERATE_RUN_TIME_STATS</code> is set to 1 in <code>FreeRTOSConfig.h</code>,
+then <code>*pulTotalRunTime</code> is set by <code>uxTaskGetSystemState()</code> to the total run
+time (as defined by the run-time statistics clock provided by the
+application) since the target booted.</p>
+<p><code>pulTotalRunTime</code> is optional, and can be set to NULL if the total run
+time is not required.</p>
+</li>
+<li>
+<p>Return value</p>
+<p>The number of <code>TaskStatus_t</code> structures that were populated by
+<code>uxTaskGetSystemState()</code> is returned.</p>
+<p>The returned value should equal the number returned by the
+<code>uxTaskGetNumberOfTasks()</code> API function, but will be zero if the value
+passed in the <code>uxArraySize</code> parameter was too small.</p>
+</li>
+</ul>
+<p><a name="list12.5" title="Listing 12.5 The TaskStatus\_t structure"></a></p>
+<pre><code class="language-c">typedef struct xTASK_STATUS
+{
+    TaskHandle_t xHandle;
+    const char *pcTaskName;
+    UBaseType_t xTaskNumber;
+    eTaskState eCurrentState;
+    UBaseType_t uxCurrentPriority;
+    UBaseType_t uxBasePriority;
+    configRUN_TIME_COUNTER_TYPE ulRunTimeCounter;
+    StackType_t * pxStackBase;
+    #if ( ( portSTACK_GROWTH &gt; 0 ) || ( configRECORD_STACK_HIGH_ADDRESS == 1 ) )
+        StackType_t * pxTopOfStack;
+        StackType_t * pxEndOfStack;
+    #endif
+    uint16_t usStackHighWaterMark;
+    #if ( ( configUSE_CORE_AFFINITY == 1 ) &amp;&amp; ( configNUMBER_OF_CORES &gt; 1 ) )
+        UBaseType_t uxCoreAffinityMask;
+    #endif
+} TaskStatus_t;
+</code></pre>
+<p><em><strong>Listing 12.5</strong></em> <em>The TaskStatus_t structure</em></p>
+<p><strong>TaskStatus_t structure members</strong></p>
+<ul>
+<li>
+<p><code>xHandle</code></p>
+<p>The handle of the task to which the information in the structure relates.</p>
+</li>
+<li>
+<p><code>pcTaskName</code></p>
+<p>The human readable text name of the task.</p>
+</li>
+<li>
+<p><code>xTaskNumber</code></p>
+<p>Each task has a unique <code>xTaskNumber</code> value.</p>
+<p>If an application creates and deletes tasks at run time then it is
+possible that a task will have the same handle as a task that was
+previously deleted. <code>xTaskNumber</code> is provided to allow application code,
+and kernel aware debuggers, to distinguish between a task that is still
+valid, and a deleted task that had the same handle as the valid
+task.</p>
+</li>
+<li>
+<p><code>eCurrentState</code></p>
+<p>An enumerated type that holds the state of the task.
+<code>eCurrentState</code> can be one of the following values:</p>
+<ul>
+<li><code>eRunning</code></li>
+<li><code>eReady</code></li>
+<li><code>eBlocked</code></li>
+<li><code>eSuspended</code></li>
+<li><code>eDeleted</code></li>
+</ul>
+<p>A task will only be reported as being in the <code>eDeleted</code> state for the
+short period between the time the task was deleted by a call to
+<code>vTaskDelete()</code>, and the time the Idle task frees the memory that was
+allocated to the deleted task's internal data structures and stack.
+After that time, the task will no longer exist in any way, and it is
+invalid to attempt to use its handle.</p>
+</li>
+<li>
+<p><code>uxCurrentPriority</code></p>
+<p>The priority at which the task was running at the time
+<code>uxTaskGetSystemState()</code> was called. <code>uxCurrentPriority</code> will only be higher
+than the priority assigned to the task by the application writer if the
+task has temporarily been assigned a higher priority in accordance with
+the priority inheritance mechanism described in section
+<a href="ch08.html#83-mutexes-and-binary-semaphores">8.3 Mutexes (and Binary Semaphores)</a>.</p>
+</li>
+<li>
+<p><code>uxBasePriority</code></p>
+<p>The priority assigned to the task by the application writer.
+<code>uxBasePriority</code> is only valid if <code>configUSE_MUTEXES</code> is set to 1 in
+FreeRTOSConfig.h.</p>
+</li>
+<li>
+<p><code>ulRunTimeCounter</code></p>
+<p>The total run time used by the task since the task was created. The
+total run time is provided as an absolute time that uses the clock
+provided by the application writer for the collection of run-time
+statistics. <code>ulRunTimeCounter</code> is only valid if
+<code>configGENERATE_RUN_TIME_STATS</code> is set to 1 in FreeRTOSConfig.h.</p>
+</li>
+<li>
+<p><code>pxStackBase</code></p>
+<p>Points to the base address of the stack region allotted to this task.</p>
+</li>
+<li>
+<p><code>pxTopOfStack</code></p>
+<p>Points to the current top address of the stack region allotted to this task.
+The field <code>pxTopOfStack</code> is only valid if either the stack grows upwards (i.e.
+<code>portSTACK_GROWTH</code> is greater than zero) or <code>configRECORD_STACK_HIGH_ADDRESS</code>
+is set to 1 in FreeRTOSConfig.h.</p>
+</li>
+<li>
+<p><code>pxEndOfStack</code></p>
+<p>Points to the end address of the of the stack region allotted to this task.
+The field <code>pxEndOfStack</code> is only valid if either the stack grows upwards (i.e.
+<code>portSTACK_GROWTH</code> is greater than zero) or <code>configRECORD_STACK_HIGH_ADDRESS</code>
+is set to 1 in FreeRTOSConfig.h.</p>
+</li>
+<li>
+<p><code>usStackHighWaterMark</code></p>
+<p>The task's stack high water mark. This is the minimum amount of
+stack space that has remained for the task since the task was created.
+It is an indication of how close the task has come to overflowing its
+stack; the closer this value is to zero, the closer the task has come to
+overflowing its stack. <code>usStackHighWaterMark</code> is specified in bytes.</p>
+</li>
+<li>
+<p><code>uxCoreAffinityMask</code></p>
+<p>A bitwise value that indicates the cores on which the task can run.
+Cores are numbered from 0 to <code>configNUMBER_OF_CORES</code> - 1. For example, a
+task that can run on core 0 and core 1 will have its <code>uxCoreAffinityMask</code>
+set to 0x03. The field <code>uxCoreAffinityMask</code> is only available if both
+<code>configUSE_CORE_AFFINITY</code> is set to 1 and <code>configNUMBER_OF_CORES</code>
+is set to greater than 1 in FreeRTOSConfig.h.</p>
+</li>
+</ul>
+<h3 id="1255-the-vtasklisttasks-helper-function"><a class="header" href="#1255-the-vtasklisttasks-helper-function">12.5.5 The vTaskListTasks() Helper Function</a></h3>
+<p><code>vTaskListTasks()</code> provides similar task status information to that provided by
+<code>uxTaskGetSystemState()</code>, but it presents the information as a human
+readable ASCII table, rather than an array of binary values.</p>
+<p><code>vTaskListTasks()</code> is a very processor intensive function, and leaves the
+scheduler suspended for an extended period. Therefore, it is recommended
+to use the function for debug purposes only, and not in a production
+real-time system.</p>
+<p><code>vTaskListTasks()</code> is available if <code>configUSE_TRACE_FACILITY</code> is set to 1 and
+<code>configUSE_STATS_FORMATTING_FUNCTIONS</code> is set to greater than 0 in
+FreeRTOSConfig.h.</p>
+<p><a name="list12.6" title="Listing 12.6 The vTaskListTasks() API function prototype"></a></p>
+<pre><code class="language-c">void vTaskListTasks( char * pcWriteBuffer, size_t uxBufferLength );
+</code></pre>
+<p><em><strong>Listing 12.6</strong></em> <em>The vTaskListTasks() API function prototype</em></p>
+<p><strong>vTaskListTasks() parameters</strong></p>
+<ul>
+<li>
+<p><code>pcWriteBuffer</code></p>
+<p>A pointer to a character buffer into which the formatted and human readable table is written.
+This buffer is assumed to be large enough to contain the generated report.<br />
+Approximately 40 bytes per task should be sufficient.</p>
+</li>
+<li>
+<p><code>uxBufferLength</code></p>
+<p>Length of the <code>pcWriteBuffer</code>.</p>
+</li>
+</ul>
+<p>An example of the output generated by <code>vTaskListTasks()</code> is shown in Figure 12.7.
+In the output:</p>
+<ul>
+<li>
+<p>Each row provides information on a single task.</p>
+</li>
+<li>
+<p>The first column is the task's name.</p>
+</li>
+<li>
+<p>The second column is the task's state, where 'X' means Running, 'R' means Ready, 'B'
+means Blocked, 'S' means Suspended, and 'D' means the task has been
+deleted. A task will only be reported as being in the deleted state
+for the short period between the time the task was deleted by a call
+to <code>vTaskDelete()</code>, and the time the Idle task frees the memory that
+was allocated to the deleted task's internal data structures and
+stack. After that time, the task will no longer exist in any way,
+and it is invalid to attempt to use its handle.</p>
+</li>
+<li>
+<p>The third column is the task's priority.</p>
+</li>
+<li>
+<p>The fourth column is the task's stack high water mark. See the
+description of <code>usStackHighWaterMark</code>.</p>
+</li>
+<li>
+<p>The fifth column is the unique number allocated to the task. See the
+description of <code>xTaskNumber</code>.</p>
+</li>
+</ul>
+<p><a name="fig12.7" title="Figure 12.7 Example output generated by vTaskListTasks()"></a></p>
+<hr />
+<p><img src="media/image88.png" alt="" /><br />
+<em><strong>Figure 12.7</strong></em> <em>Example output generated by vTaskListTasks()</em></p>
+<hr />
+<blockquote>
+<p>Note:<br />
+The older version of <code>vTaskListTasks</code> is <code>vTaskList</code>. <code>vTaskList</code> assumes that the
+<code>pcWriteBuffer</code> is of length <code>configSTATS_BUFFER_MAX_LENGTH</code>. This function is there only for
+backward compatibility. New applications are recommended to use <code>vTaskListTasks</code> and
+supply the length of the <code>pcWriteBuffer</code> explicitly.</p>
+</blockquote>
+<p><a name="list12.7" title="Listing 12.7 The vTaskList() API function prototype"></a></p>
+<pre><code class="language-c">void vTaskList( signed char *pcWriteBuffer );
+</code></pre>
+<p><em><strong>Listing 12.7</strong></em> <em>The vTaskList() API function prototype</em></p>
+<p><strong>vTaskList() parameters</strong></p>
+<ul>
+<li>
+<p><code>pcWriteBuffer</code></p>
+<p>A pointer to a character buffer into which the formatted and human readable table is written.
+The buffer must be large enough to hold the entire table, as no boundary checking is performed.</p>
+</li>
+</ul>
+<h3 id="1256-the-vtaskgetruntimestatistics-helper-function"><a class="header" href="#1256-the-vtaskgetruntimestatistics-helper-function">12.5.6 The vTaskGetRunTimeStatistics() Helper Function</a></h3>
+<p><code>vTaskGetRunTimeStatistics()</code> formats collected run-time statistics into a
+human readable ASCII table.</p>
+<p><code>vTaskGetRunTimeStatistics()</code> is a very processor intensive function and leaves
+the scheduler suspended for an extended period. Therefore, it is
+recommended to use the function for debug purposes only, and not in a
+production real-time system.</p>
+<p><code>vTaskGetRunTimeStatistics()</code> is available when <code>configGENERATE_RUN_TIME_STATS</code> is set to
+1, <code>configUSE_STATS_FORMATTING_FUNCTIONS</code> is set greater than 0, and
+<code>configUSE_TRACE_FACILITY</code> is set to 1 in FreeRTOSConfig.h.</p>
+<p><a name="list12.8" title="Listing 12.8 The vTaskGetRunTimeStatistics() API function prototype"></a></p>
+<pre><code class="language-c">void vTaskGetRunTimeStatistics( char * pcWriteBuffer, size_t uxBufferLength );
+</code></pre>
+<p><em><strong>Listing 12.8</strong></em> <em>The vTaskGetRunTimeStatistics() API function prototype</em></p>
+<p><strong>vTaskGetRunTimeStatistics() parameters</strong></p>
+<ul>
+<li>
+<p><code>pcWriteBuffer</code></p>
+<p>A pointer to a character buffer into which the formatted and human readable table is written.
+This buffer is assumed to be large enough to contain the generated report.<br />
+Approximately 40 bytes per task should be sufficient.</p>
+</li>
+<li>
+<p><code>uxBufferLength</code></p>
+<p>Length of the <code>pcWriteBuffer</code>.</p>
+</li>
+</ul>
+<p>An example of the output generated by <code>vTaskGetRunTimeStatistics()</code> is shown in
+Figure 12.8. In the output:</p>
+<ul>
+<li>
+<p>Each row provides information on a single task.</p>
+</li>
+<li>
+<p>The first column is the task name.</p>
+</li>
+<li>
+<p>The second column is the amount of time the task has spent in the
+Running state as an absolute value. See the description of
+<code>ulRunTimeCounter</code>.</p>
+</li>
+<li>
+<p>The third column is the amount of time the task has spent in the
+Running state as a percentage of the total time since the target was
+booted. The total of the displayed percentage times will normally be
+less than the expected 100% because statistics are collected and
+calculated using integer calculations that round down to the nearest
+integer value.</p>
+</li>
+</ul>
+<p><a name="fig12.8" title="Figure 12.8 Example output generated by vTaskGetRunTimeStatistics()"></a></p>
+<hr />
+<p><img src="media/image89.png" alt="" /><br />
+<em><strong>Figure 12.8</strong></em> <em>Example output generated by vTaskGetRunTimeStatistics()</em></p>
+<hr />
+<blockquote>
+<p>Note:<br />
+The older version of <code>vTaskGetRunTimeStatistics</code> is <code>vTaskGetRunTimeStats</code>.
+<code>vTaskGetRunTimeStats</code> assumes that the pcWriteBuffer is of length
+<code>configSTATS_BUFFER_MAX_LENGTH</code>. This function is there only for backward compatiblity.
+New applications are recommended to use <code>vTaskGetRunTimeStatistics</code> and supply the length
+of the pcWriteBuffer explicitly.</p>
+</blockquote>
+<p><a name="list12.9" title="Listing 12.9 The vTaskGetRunTimeStats() API function prototype"></a></p>
+<pre><code class="language-c">void vTaskGetRunTimeStats( signed char *pcWriteBuffer );
+</code></pre>
+<p><em><strong>Listing 12.9</strong></em> <em>The vTaskGetRunTimeStats() API function prototype</em></p>
+<p><strong>vTaskGetRunTimeStats() parameters</strong></p>
+<ul>
+<li>
+<p><code>pcWriteBuffer</code></p>
+<p>A pointer to a character buffer into which the formatted and human readable table is written. The
+buffer must be large enough to hold the entire table, as no boundary checking is performed.</p>
+</li>
+</ul>
+<h3 id="1257-generating-and-displaying-run-time-statistics-a-worked-example"><a class="header" href="#1257-generating-and-displaying-run-time-statistics-a-worked-example">12.5.7 Generating and Displaying Run-Time Statistics, a Worked Example</a></h3>
+<p>This example uses a hypothetical 16-bit timer to generate a 32-bit
+run-time statistics clock. The counter is configured to generate an
+interrupt each time the 16-bit value reaches its maximum
+value—effectively creating an overflow interrupt. The interrupt service
+routine counts the number of overflow occurrences.</p>
+<p>The 32-bit value is created by using the count of overflow occurrences
+as the two most significant bytes of the 32-bit value, and the current
+16-bit counter value as the two least significant bytes of the 32-bit
+value. Pseudo code for the interrupt service routine is shown in Listing
+12.10.</p>
+<p><a name="list12.10" title="Listing 12.10 16-bit timer overflow interrupt handler used to count timer overflows"></a></p>
+<pre><code class="language-c">void TimerOverflowInterruptHandler( void )
+{
+    /* Just count the number of interrupts. */
+    ulOverflowCount++;
+
+    /* Clear the interrupt. */
+    ClearTimerInterrupt();
+}
+</code></pre>
+<p><em><strong>Listing 12.10</strong></em> <em>16-bit timer overflow interrupt handler used to count timer overflows</em></p>
+<p>Listing 12.11 shows the lines added to FreeRTOSConfig.h to enable the
+collection of run-time statistics.</p>
+<p><a name="list12.11" title="Listing 12.11 Macros added to FreeRTOSConfig.h to enable the collection of run-time statistics"></a></p>
+<pre><code class="language-c">/* Set configGENERATE_RUN_TIME_STATS to 1 to enable collection of run-time 
+   statistics. When this is done, both portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()
+   and portGET_RUN_TIME_COUNTER_VALUE() or 
+   portALT_GET_RUN_TIME_COUNTER_VALUE(x) must also be defined. */
+#define configGENERATE_RUN_TIME_STATS 1
+
+/* portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() is defined to call the function 
+   that sets up the hypothetical 16-bit timer (the function's implementation 
+   is not shown). */
+void vSetupTimerForRunTimeStats( void );
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()  vSetupTimerForRunTimeStats()
+
+/* portALT_GET_RUN_TIME_COUNTER_VALUE() is defined to set its parameter to the
+   current run-time counter/time value. The returned time value is 32-bits 
+   long, and is formed by shifting the count of 16-bit timer overflows into 
+   the top two bytes of a 32-bit number, then bitwise ORing the result with 
+   the current 16-bit counter value. */
+#define portALT_GET_RUN_TIME_COUNTER_VALUE( ulCountValue )                  \
+{                                                                           \
+    extern volatile unsigned long ulOverflowCount;                          \
+                                                                            \
+    /* Disconnect the clock from the counter so it does not change          \
+       while its value is being used. */                                    \
+    PauseTimer();                                                           \
+                                                                            \
+    /* The number of overflows is shifted into the most significant         \
+       two bytes of the returned 32-bit value. */                           \
+    ulCountValue = ( ulOverflowCount &lt;&lt; 16UL );                             \
+                                                                            \
+    /* The current counter value is used as the two least significant       \
+       bytes of the returned 32-bit value. */                               \
+    ulCountValue |= ( unsigned long ) ReadTimerCount();                     \
+                                                                            \
+    /* Reconnect the clock to the counter. */                               \
+    ResumeTimer();                                                          \
+}
+</code></pre>
+<p><em><strong>Listing 12.11</strong></em> <em>Macros added to FreeRTOSConfig.h to enable the collection of run-time statistics</em></p>
+<p>The task shown in Listing 12.12 prints out the collected run-time statistics every 5 seconds.</p>
+<p><a name="list12.12" title="Listing 12.12 The task that prints out the collected run-time statistics"></a></p>
+<pre><code class="language-c">#define RUN_TIME_STATS_STRING_BUFFER_LENGTH       512
+
+/* For clarity, calls to fflush() have been omitted from this code listing. */
+static void prvStatsTask( void *pvParameters )
+{
+    TickType_t xLastExecutionTime;
+
+    /* The buffer used to hold the formatted run-time statistics text needs to
+       be quite large. It is therefore declared static to ensure it is not
+       allocated on the task stack. This makes this function non re-entrant. */
+    static signed char cStringBuffer[ RUN_TIME_STATS_STRING_BUFFER_LENGTH ];
+
+    /* The task will run every 5 seconds. */
+    const TickType_t xBlockPeriod = pdMS_TO_TICKS( 5000 );
+
+    /* Initialize xLastExecutionTime to the current time. This is the only
+       time this variable needs to be written to explicitly. Afterwards it is 
+       updated internally within the vTaskDelayUntil() API function. */
+    xLastExecutionTime = xTaskGetTickCount();
+
+    /* As per most tasks, this task is implemented in an infinite loop. */
+    for( ;; )
+    {
+        /* Wait until it is time to run this task again. */
+        xTaskDelayUntil( &amp;xLastExecutionTime, xBlockPeriod );
+
+        /* Generate a text table from the run-time stats. This must fit into
+           the cStringBuffer array. */
+        vTaskGetRunTimeStatistics( cStringBuffer, RUN_TIME_STATS_STRING_BUFFER_LENGTH );
+
+        /* Print out column headings for the run-time stats table. */
+        printf( "\nTask\t\tAbs\t\t\t%%\n" );
+        printf( "-------------------------------------------------------------\n" );
+
+        /* Print out the run-time stats themselves. The table of data contains
+           multiple lines, so the vPrintMultipleLines() function is called 
+           instead of calling printf() directly. vPrintMultipleLines() simply 
+           calls printf() on each line individually, to ensure the line 
+           buffering works as expected. */ 
+        vPrintMultipleLines( cStringBuffer );
+    }
+}
+</code></pre>
+<p><em><strong>Listing 12.12</strong></em> <em>The task that prints out the collected run-time statistics</em></p>
+<h2 id="126-trace-hook-macros"><a class="header" href="#126-trace-hook-macros">12.6 Trace Hook Macros</a></h2>
+<p>Trace macros are macros that have been placed at key points within the
+FreeRTOS source code. By default, the macros are empty, and so do not
+generate any code, and have no run time overhead. By overriding the
+default empty implementations, an application writer can:</p>
+<ul>
+<li>
+<p>Insert code into FreeRTOS without modifying the FreeRTOS source
+files.</p>
+</li>
+<li>
+<p>Output detailed execution sequencing information by any means
+available on the target hardware. Trace macros appear in enough
+places in the FreeRTOS source code to allow them to be used to
+create a full and detailed scheduler activity trace and profiling
+log.</p>
+</li>
+</ul>
+<h3 id="1261-available-trace-hook-macros"><a class="header" href="#1261-available-trace-hook-macros">12.6.1 Available Trace Hook Macros</a></h3>
+<p>It would take too much space to detail every macro here. The list below
+details the subset of macros deemed to be most useful to an application
+writer.</p>
+<p>Many of the descriptions in the list below refer to a variable called
+<code>pxCurrentTCB</code>. <code>pxCurrentTCB</code> is a FreeRTOS private variable that holds the
+handle of the task in the Running state, and is available to any macro
+that is called from the FreeRTOS/Source/tasks.c source file.</p>
+<p><strong>A selection of the most commonly used trace hook macros</strong></p>
+<ul>
+<li>
+<p><code>traceTASK_INCREMENT_TICK(xTickCount)</code></p>
+<p>Called during the tick interrupt, before the tick count is incremented. The <code>xTickCount</code> parameter
+passes the new tick count value into the macro.</p>
+</li>
+<li>
+<p><code>traceTASK_SWITCHED_OUT()</code></p>
+<p>Called before a new task is selected to run. At this point, <code>pxCurrentTCB</code> contains the handle of
+the task about to leave the Running state.</p>
+</li>
+<li>
+<p><code>traceTASK_SWITCHED_IN()</code></p>
+<p>Called after a task is selected to run. At this point, <code>pxCurrentTCB</code> contains the handle of the
+task about to enter the Running state.</p>
+</li>
+<li>
+<p><code>traceBLOCKING_ON_QUEUE_RECEIVE(pxQueue)</code></p>
+<p>Called immediately before the currently executing task enters the Blocked state following an attempt
+to read from an empty queue, or an attempt to 'take' an empty semaphore or mutex. The <code>pxQueue</code> parameter
+passes the handle of the target queue or semaphore into the macro.</p>
+</li>
+<li>
+<p><code>traceBLOCKING_ON_QUEUE_SEND(pxQueue)</code></p>
+<p>Called immediately before the currently executing task enters the Blocked state following an attempt
+to write to a queue that is full. The <code>pxQueue</code> parameter passes the handle of the target queue into
+the macro.</p>
+</li>
+<li>
+<p><code>traceQUEUE_SEND(pxQueue)</code></p>
+<p>Called from within <code>xQueueSend()</code>, <code>xQueueSendToFront()</code>, <code>xQueueSendToBack()</code>, or any of the semaphore
+'give' functions, when the queue send or semaphore 'give' is successful. The <code>pxQueue</code> parameter passes
+the handle of the target queue or semaphore into the macro.</p>
+</li>
+<li>
+<p><code>traceQUEUE_SEND_FAILED(pxQueue)</code></p>
+<p>Called from within <code>xQueueSend()</code>, <code>xQueueSendToFront()</code>, <code>xQueueSendToBack()</code>, or any of the semaphore
+'give' functions, when the queue send or semaphore 'give' operation fails. A queue send or semaphore
+'give' will fail if the queue is full and remains full for the duration of any block time specified.
+The <code>pxQueue</code> parameter passes the handle of the target queue or semaphore into the macro.</p>
+</li>
+<li>
+<p><code>traceQUEUE_RECEIVE(pxQueue)</code></p>
+<p>Called from within <code>xQueueReceive()</code> or any of the semaphore 'take' functions when the queue receive or
+semaphore 'take' is successful. The <code>pxQueue</code> parameter passes the handle of the target queue or semaphore
+into the macro.</p>
+</li>
+<li>
+<p><code>traceQUEUE_RECEIVE_FAILED(pxQueue)</code></p>
+<p>Called from within <code>xQueueReceive()</code> or any of the semaphore 'take' functions when the queue or semaphore
+receive operation fails. A queue receive or semaphore 'take' operation will fail if the queue or semaphore
+is empty and remains empty for the duration of any block time specified. The <code>pxQueue</code> parameter passes the
+handle of the target queue or semaphore into the macro.</p>
+</li>
+<li>
+<p><code>traceQUEUE_SEND_FROM_ISR(pxQueue)</code></p>
+<p>Called from within <code>xQueueSendFromISR()</code> when the send operation is successful. The <code>pxQueue</code> parameter
+passes the handle of the target queue into the macro.</p>
+</li>
+<li>
+<p><code>traceQUEUE_SEND_FROM_ISR_FAILED(pxQueue)</code></p>
+<p>Called from within <code>xQueueSendFromISR()</code> when the send operation fails. A send operation will fail
+if the queue is already full. The <code>pxQueue</code> parameter passes the handle of the target queue into the
+macro.</p>
+</li>
+<li>
+<p><code>traceQUEUE_RECEIVE_FROM_ISR(pxQueue)</code></p>
+<p>Called from within <code>xQueueReceiveFromISR()</code> when the receive operation is successful. The <code>pxQueue</code>
+parameter passes the handle of the target queue into the macro.</p>
+</li>
+<li>
+<p><code>traceQUEUE_RECEIVE_FROM_ISR_FAILED(pxQueue)</code></p>
+<p>Called from within <code>xQueueReceiveFromISR()</code> when the receive operation fails due to the queue already
+being empty. The <code>pxQueue</code> parameter passes the handle of the target queue into the macro.</p>
+</li>
+<li>
+<p><code>traceTASK_DELAY_UNTIL( xTimeToWake )</code></p>
+<p>Called from within <code>xTaskDelayUntil()</code> immediately before the calling task enters the Blocked state.</p>
+</li>
+<li>
+<p><code>traceTASK_DELAY()</code></p>
+<p>Called from within <code>vTaskDelay()</code> immediately before the calling task enters the Blocked state.</p>
+</li>
+</ul>
+<h3 id="1262-defining-trace-hook-macros"><a class="header" href="#1262-defining-trace-hook-macros">12.6.2 Defining Trace Hook Macros</a></h3>
+<p>Each trace macro has a default empty definition. The default definition
+can be overridden by providing a new macro definition in
+FreeRTOSConfig.h. If trace macro definitions become long or complex,
+then they can be implemented in a new header file that is then itself
+included from FreeRTOSConfig.h.</p>
+<p>In accordance with software engineering best practice, FreeRTOS
+maintains a strict data hiding policy. Trace macros allow user code to
+be added to the FreeRTOS source files, so the data types visible to the
+trace macros will be different to those visible to application code:</p>
+<ul>
+<li>
+<p>Inside the FreeRTOS/Source/tasks.c source file, a task handle is a
+pointer to the data structure that describes a task (the task's
+<em>Task Control Block</em>, or <em>TCB</em>). Outside of the
+FreeRTOS/Source/tasks.c source file a task handle is a pointer to
+void.</p>
+</li>
+<li>
+<p>Inside the FreeRTOS/Source/queue.c source file, a queue handle is a
+pointer to the data structure that describes a queue. Outside of the
+FreeRTOS/Source/queue.c source file a queue handle is a pointer to
+void.</p>
+</li>
+</ul>
+<blockquote>
+<p><em>Extreme caution is required if a normally private FreeRTOS data
+structure is accessed directly by a trace macro, as private data
+structures might change between FreeRTOS versions.</em></p>
+</blockquote>
+<h3 id="1263-freertos-aware-debugger-plug-ins"><a class="header" href="#1263-freertos-aware-debugger-plug-ins">12.6.3 FreeRTOS Aware Debugger Plug-ins</a></h3>
+<p>Plug-ins that provide some FreeRTOS awareness are available for the
+following IDEs. This list may not be an exhaustive:</p>
+<p><img src="media/image90.png" alt="" /></p>
+<ul>
+<li>
+<p>Eclipse (StateViewer)</p>
+</li>
+<li>
+<p>Eclipse (ThreadSpy)</p>
+</li>
+<li>
+<p>IAR</p>
+</li>
+<li>
+<p>ARM DS-5</p>
+</li>
+<li>
+<p>Atollic TrueStudio</p>
+</li>
+<li>
+<p>Microchip MPLAB</p>
+</li>
+<li>
+<p>iSYSTEM WinIDEA</p>
+</li>
+<li>
+<p>STM32CubeIDE</p>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="ch11.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="ch13.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="ch11.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="ch13.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
