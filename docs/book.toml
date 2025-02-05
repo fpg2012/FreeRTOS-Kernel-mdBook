@@ -5,4 +5,7 @@ multilingual = false
 src = "src"
 title = "FreeRTOS Kernel Book"
 
+[build]
+build-dir = "docs"
+
 [output.epub]
